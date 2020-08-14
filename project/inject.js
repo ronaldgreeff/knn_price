@@ -100,3 +100,5 @@ function extract() {
 };
 
 var data = extract();
+
+return data;

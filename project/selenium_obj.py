@@ -9,9 +9,9 @@ class Driver_Config():
     headless state, browser driver and window size """
 
     options = Options()
-    options.headless=True
+    options.headless=False
     driver = webdriver.Firefox(options=options)
-    # driver.set_window_size(4000, 1600)
+    driver.set_window_size(1920, 1080)
     # driver.maximize_window()
 
 class Driver(Driver_Config):
@@ -26,7 +26,7 @@ class Driver(Driver_Config):
         print('{}\n...quitting'.format(m))
         self.driver.quit()
 
-    def process_page(self, url):
+    def process_url(self, url):
         """ Inject script, catch exceptions """
         try:
             try:
@@ -40,18 +40,30 @@ class Driver(Driver_Config):
         except Exception as e:
             self.quit(m='failed to process_page: {}'.format(e))
 
+    def process_file(self, file):
+        """ Open local file """
 
-if __name__ == '__main__':
+        try:
+            self.driver.get('file://{}'.format(file))
+        except Exception as e:
+            self.quit(m='failed to open file: {}'.format(e))
 
-    script = os.path.join(os.path.dirname(__file__), 'inject.js')
-    slnm_driver = Driver(script)
+        extract = self.driver.execute_script(self.script)
+        return extract
 
-    try:
-        extract = slnm_driver.process_page(url)
 
-        if extract:
+# if __name__ == '__main__':
 
-            # pass to database writer
+#     script = os.path.join(os.path.dirname(__file__), 'inject.js')
+#     slnm_driver = Driver(script)
 
-    finally:
-        slnm_driver.quit('Done.')
+#     try:
+#         extract = slnm_driver.process_url(url)
+
+#         if extract:
+#             print(extract)
+
+#             # pass to database writer
+
+#     finally:
+#         slnm_driver.quit('Done.')
