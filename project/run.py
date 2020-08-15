@@ -7,22 +7,28 @@ from selenium_obj import Driver
 
 if __name__ == '__main__':
 
-    # single_eg = {"adorebeauty": ["Cloud Nine Gift of Gold - Original Iron Reviews + Free Post.html"]}
-    # src = os.path.join(os.getcwd(), 'data', 'adorebeauty', single_eg['adorebeauty'][0])
     local_files = LocalFiles()
-    # temp_local_file = local_files.pages['adorebeauty'][0]
-    script = 'inject.js'
+    # local_files.get_local_pages()
 
     for i in local_files.yield_file_paths():
-        print(i)
+        pass
 
-    # try:
-    #     crawler = Driver(script)
+    script = 'inject.js'
 
-    #             extract = crawler.process_file(src)
+    src = "C:\\Users\\User McUser\\Projects\\python\\knn_price\\project\\data\\adorebeauty\\Cloud Nine Gift of Gold - Original Iron Reviews + Free Post.html"
+    try:
+        crawler = Driver(script)
+        extract = crawler.process_file(src)
 
-    # finally:
-    #     crawler.quit(m="end run.")
+        texts = extract['texts']
+        for t in texts:
+            h = t['text']
+            for x in h:
+                print(x.encode('utf-8'))
+
+
+    finally:
+        crawler.quit(m="end run.")
 
 
 

@@ -2,6 +2,9 @@ import os
 
 class LocalFiles():
 
+    def __init__(self):
+        self.get_local_pages()
+
     def get_local_pages(self):
         """ Get folder (vendor) and file (html) list for pages in /data
             in the format {vendor: [page, ...], ...} """
@@ -15,8 +18,8 @@ class LocalFiles():
         return d
 
     def yield_file_paths(self):
-        for vendor in local_files.pages:
-            for page in local_files.pages[vendor]:
+        for vendor in self.pages:
+            for page in self.pages[vendor]:
                 src = os.path.join(os.getcwd(), 'data', vendor, page)
 
                 yield src
