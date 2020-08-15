@@ -18,8 +18,15 @@ class LocalFiles():
         return d
 
     def yield_file_paths(self):
-        for vendor in self.pages:
-            for page in self.pages[vendor]:
-                src = os.path.join(os.getcwd(), 'data', vendor, page)
+        """ get full file path and url """
 
-                yield src
+        cwd = os.getcwd()
+        for vendor in self.pages:
+            vd = os.path.join(cwd, 'data', vendor)
+            urls = open( os.path.join(vd, 'urls.txt'), 'r').readlines()
+
+            for i, page in enumerate(self.pages[vendor]):
+                src = os.path.join(vd, page)
+                url = urls[i]
+
+                yield url, src

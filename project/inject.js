@@ -1,3 +1,7 @@
+function util__strip(str) {
+  return str.replace(/^\s+|\s+$/g, '');
+}
+
 function util__computed(element) {
   var computed, data, defaults, key, _i, _len;
   defaults = document.defaultView.getComputedStyle(document.body);
@@ -20,11 +24,19 @@ function util__computed(element) {
 };
 
 function util__bound(element) {
-    var bound, rect, scrollLeft, scrollTop;
+    var bound, rect, scrollLeft, scrollTop, bodyDimensions, bodyVolume;
+    bodyDimensions = document.body.getDimensions();
+    bodyVolume = (bodyDimensions['width']*bodyDimensions['height']);
     scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
     rect = element.getBoundingClientRect();
     bound = {
+      calc: {
+        bodyDimensions: bodyDimensions,
+        rectVolume: (rect.width*rect.height),
+        normalisedVolume: ((rect.width*rect.height)/bodyVolume),
+        normalisedTop: (rect.top/bodyDimensions['height']),
+      },
       width: rect.width,
       height: rect.height,
       left: rect.left + scrollLeft,
@@ -46,7 +58,7 @@ function extractor__extract_texts() {
     if (!(bound.width * bound.height > 0)) {
       continue;
     }
-    else if (bound.top > window.innerHeight) {
+    else if (bound.top > window.innerHeight || (bound.top + bound.height) > window.innerHeight ) {
         continue;
     }
     while (node) {
@@ -60,11 +72,11 @@ function extractor__extract_texts() {
       continue;
     }
     if (node.__spider) {
-      node.__spider.text.push(text.nodeValue);
+      node.__spider.text.push(util__strip(text.nodeValue));
       continue
     }
     node.__spider = {
-      text: [text.nodeValue],
+      text: [util__strip(text.nodeValue)],
       html: node.innerHTML,
       bound: util__bound(node),
       computed: util__computed(node)

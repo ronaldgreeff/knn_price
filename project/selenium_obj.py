@@ -9,7 +9,7 @@ class Driver_Config():
     headless state, browser driver and window size """
 
     options = Options()
-    options.headless=False
+    options.headless=True
     driver = webdriver.Firefox(options=options)
     driver.set_window_size(1920, 1080)
     # driver.maximize_window()

@@ -8,27 +8,46 @@ from selenium_obj import Driver
 if __name__ == '__main__':
 
     local_files = LocalFiles()
-    # local_files.get_local_pages()
-
-    for i in local_files.yield_file_paths():
-        pass
-
+    db_write = DBWriter()
     script = 'inject.js'
 
-    src = "C:\\Users\\User McUser\\Projects\\python\\knn_price\\project\\data\\adorebeauty\\Cloud Nine Gift of Gold - Original Iron Reviews + Free Post.html"
-    try:
-        crawler = Driver(script)
-        extract = crawler.process_file(src)
+    # try:
+    #     crawler = Driver(script)
+    #     src = 'data\\adorebeauty\\Cloud Nine Gift of Gold - Original Iron Reviews + Free Post.html'
+    #     extract = crawler.process_file(src)
 
-        texts = extract['texts']
-        for t in texts:
-            h = t['text']
-            for x in h:
-                print(x.encode('utf-8'))
+    #     for text in extract['texts']:
+    #         print('{} {} {}'.format(
+    #             text['bound']['calc']['normalisedTop'],
+    #             text['bound']['calc']['normalisedVolume'],
+    #             [t.encode('utf-8').strip() for t in text['text']],))
 
+    # finally:
+    #     crawler.quit(m="end run.")
 
-    finally:
-        crawler.quit(m="end run.")
+    for url, src in local_files.yield_file_paths():
+
+        try:
+            crawler = Driver(script)
+            extract = crawler.process_file(src)
+
+            url = 'https://www.adorebeauty.com.au/cloud-nine-cloud-9/cloud-nine-gift-of-gold-original-iron-2018.html'
+            src = 'C:\\Users\\User McUser\\Projects\\python\\knn_price\\project\\data\\adorebeauty\\Cloud Nine Gift of Gold - Original Iron Reviews + Free Post.html'
+
+            db_write.store_page_extract(url=url, extract=extract)
+
+            print(url)
+            print(src)
+            for text in extract['texts']:
+                print('{:.2f} {:.2f} {}'.format(
+                    ((text['bound']['calc']['normalisedTop']*100)),
+                    ((text['bound']['calc']['normalisedVolume']*100)),
+                    [t.encode('utf-8') for t in text['text']],))
+
+            break
+
+        finally:
+            crawler.quit(m="end run.")
 
 
 

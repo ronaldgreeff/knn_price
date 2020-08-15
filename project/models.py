@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 from peewee import *
+from urllib.parse import urlparse, urlunparse
+import json
 
 database = SqliteDatabase('database.db')
 
@@ -27,10 +29,12 @@ class Block(BaseModel):
     text = CharField(max_length=64)
     html = CharField(max_length=64)
     label = CharField(null=True)
-    width = DecimalField()
-    height = DecimalField()
-    left = DecimalField()
     top = DecimalField()
+    volume = DecimalField()
+    # width = DecimalField()
+    # height = DecimalField()
+    # left = DecimalField()
+    # top = DecimalField()
 
 class CSSKey(BaseModel):
     key = CharField(unique=True)
@@ -66,7 +70,7 @@ class DBWriter():
         parsed_url = urlparse(url)
         clean_url = urlunparse(parsed_url) # remove url clutter
 
-        cleaned_links = self.cleaned_links(parsed_url[1], extract['links'])
+        cleaned_links = self.clean_links(parsed_url[1], extract['links'])
 
         with database.atomic() as transaction:
 
@@ -94,18 +98,20 @@ class DBWriter():
 
             for block in extract['texts']:
 
-                text = json.dumps(block['text']) # json.dumps(a list)
+                text = json.dumps(block['text']) # json.dumps([a list of texts])
                 bound = block['bound']
 
                 block_obj = Block.create(
                     page=page_obj,
                     text=text,
                     html=block['html'],
-                    top=float(bound['top']),
-                    left=float(bound['left']),
-                    width=float(bound['width']),
-                    height=float(bound['height']),)
-
+                    top=bound['calc']['normalisedTop'],
+                    volume=bound['calc']['normalisedVolume'],
+                    # top=float(bound['top']),
+                    # left=float(bound['left']),
+                    # width=float(bound['width']),
+                    # height=float(bound['height']),
+                )
                 computed = block['computed']
 
                 for key, val in computed.items():
