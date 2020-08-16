@@ -24,19 +24,11 @@ function util__computed(element) {
 };
 
 function util__bound(element) {
-    var bound, rect, scrollLeft, scrollTop, bodyDimensions, bodyVolume;
-    bodyDimensions = document.body.getDimensions();
-    bodyVolume = (bodyDimensions['width']*bodyDimensions['height']);
+    var bound, rect, scrollLeft, scrollTop;
     scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
     rect = element.getBoundingClientRect();
     bound = {
-      calc: {
-        bodyDimensions: bodyDimensions,
-        rectVolume: (rect.width*rect.height),
-        normalisedVolume: ((rect.width*rect.height)/bodyVolume),
-        normalisedTop: (rect.top/bodyDimensions['height']),
-      },
       width: rect.width,
       height: rect.height,
       left: rect.left + scrollLeft,
@@ -107,6 +99,11 @@ function extract() {
 
   data['texts'] = texts;
   data['links'] = links;
+
+  data['env'] = {
+    window_height: window.innerHeight,
+    window_width: window.innerWidth,
+  };
 
   return data;
 };

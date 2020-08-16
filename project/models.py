@@ -23,18 +23,18 @@ class Page(BaseModel):
     updated = DateTimeField(default=datetime.now())
     label = CharField(null=True)
     is_sale = BooleanField(null=True)
+    window_innerHeight = IntegerField()
+    window_innerWidth = IntegerField()
 
 class Block(BaseModel):
     page = ForeignKeyField(Page, on_delete='CASCADE')
-    text = CharField(max_length=64)
-    html = CharField(max_length=64)
+    text = CharField()
+    html = CharField()
     label = CharField(null=True)
+    width = DecimalField()
+    height = DecimalField()
+    left = DecimalField()
     top = DecimalField()
-    volume = DecimalField()
-    # width = DecimalField()
-    # height = DecimalField()
-    # left = DecimalField()
-    # top = DecimalField()
 
 class CSSKey(BaseModel):
     key = CharField(unique=True)
@@ -83,10 +83,13 @@ class DBWriter():
                 page_obj = Page.get(url=clean_url)
                 if purge_record:
                     page_obj.delete_instance(recursive=True)
+                    # raise Exception(Page.DoesNotExist) #todo: test
             except Page.DoesNotExist:
                 page_obj = Page.create(
                     site=site_obj,
-                    url=clean_url,)
+                    url=clean_url,
+                    window_innerHeight=extract['env']['window_height'],
+                    window_innerWidth=extract['env']['window_width'],)
 
             for link in cleaned_links:
                 try:
@@ -105,12 +108,10 @@ class DBWriter():
                     page=page_obj,
                     text=text,
                     html=block['html'],
-                    top=bound['calc']['normalisedTop'],
-                    volume=bound['calc']['normalisedVolume'],
-                    # top=float(bound['top']),
-                    # left=float(bound['left']),
-                    # width=float(bound['width']),
-                    # height=float(bound['height']),
+                    top=float(bound['top']),
+                    left=float(bound['left']),
+                    width=float(bound['width']),
+                    height=float(bound['height']),
                 )
                 computed = block['computed']
 

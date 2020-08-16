@@ -23,8 +23,12 @@ class Driver(Driver_Config):
 
     def quit(self, m=None):
         """ Quit the driver """
-        print('{}\n...quitting'.format(m))
+        print('{} ...quitting'.format(m))
         self.driver.quit()
+
+    def close(self):
+        print('...closing driver')
+        self.driver.close()
 
     def process_url(self, url):
         """ Inject script, catch exceptions """
