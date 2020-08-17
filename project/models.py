@@ -44,9 +44,14 @@ class Computed(BaseModel):
     key = ForeignKeyField(CSSKey)
     val = CharField(null=True)
 
+class DBReader():
+
+    def collect_df_data(self):
+        query = Site.select()
+        return query.sql()[0], database
 
 class DBWriter():
-    
+
     def __init__(self):
         """ build db """
 

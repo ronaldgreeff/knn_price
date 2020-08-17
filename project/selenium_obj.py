@@ -18,41 +18,37 @@ class Driver(Driver_Config):
     """ Main driver for navigating to webpage and interacting with it """
 
     def __init__(self, script):
+        """ Initiate driver and load script """
         self.driver = Driver_Config.driver
         self.script = open(script).read()
 
     def quit(self, m=None):
-        """ Quit the driver """
-        print('{} ...quitting'.format(m))
+        """ Quit the driver. Print a message if provided """
+        if m:
+            print('{}'.format(m))
         self.driver.quit()
 
-    def close(self):
-        print('...closing driver')
-        self.driver.close()
-
-    def process_url(self, url):
-        """ Inject script, catch exceptions """
+    def extract_from_document(document):
+        """ Navigate to URL or local file (document), inject script, return
+        extract, catch any exceptions """
         try:
-            try:
-                self.driver.get(url)
-            except Exception as e:
-                self.quit(m='failed to get url: {}'.format(e))
-
-            extract = self.driver.execute_script(self.script)
-            return extract
-
+            self.driver.get(document)
         except Exception as e:
-            self.quit(m='failed to process_page: {}'.format(e))
-
-    def process_file(self, vd, page, screenshot=False):
-        """ Open local file """
-        file = os.path.join(vd, page)
-        try:
-            self.driver.get('file://{}'.format(file))
-        except Exception as e:
-            self.quit(m='failed to open file: {}'.format(e))
+            self.quit(m='FAILED EXTRACT: {}'.format(e))
 
         extract = self.driver.execute_script(self.script)
+        return extract
+
+    def process_url(self, url):
+        """ Extract from a url """
+        # TODO: process url for vendor and file name
+        return self.extract_from_document(url)
+
+    def process_file(self, vd, page, screenshot=False):
+        """ Extract from local file """
+
+        local_file = 'file://{}'.format( os.path.join(vd, page) )
+        extract = self.extract_from_document(local_file)
 
         if screenshot:
             f = page.split('.')[0]
@@ -62,20 +58,3 @@ class Driver(Driver_Config):
             self.driver.save_screenshot(sd)
 
         return extract
-
-
-# if __name__ == '__main__':
-
-#     script = os.path.join(os.path.dirname(__file__), 'inject.js')
-#     slnm_driver = Driver(script)
-
-#     try:
-#         extract = slnm_driver.process_url(url)
-
-#         if extract:
-#             print(extract)
-
-#             # pass to database writer
-
-#     finally:
-#         slnm_driver.quit('Done.')
