@@ -26,7 +26,6 @@ class LocalFiles():
             urls = open( os.path.join(vd, 'urls.txt'), 'r').readlines()
 
             for i, page in enumerate(self.pages[vendor]):
-                src = os.path.join(vd, page)
                 url = urls[i]
 
-                yield url, src
+                yield url, vd, page

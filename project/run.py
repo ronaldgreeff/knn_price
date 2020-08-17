@@ -15,10 +15,10 @@ if __name__ == '__main__':
     crawler = Driver(script)
 
     try:
-        for url, src in local_files.yield_file_paths():
-            print(src)
+        for url, vd, page in local_files.yield_file_paths():
+            src = os.path.join(vd, page)
 
-            extract = crawler.process_file(src)
+            extract = crawler.process_file(vd=vd, page=page, screenshot=True)
             # crawler.close()
 
             db_write.store_page_extract(url=url, extract=extract)

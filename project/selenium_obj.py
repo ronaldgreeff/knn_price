@@ -44,15 +44,23 @@ class Driver(Driver_Config):
         except Exception as e:
             self.quit(m='failed to process_page: {}'.format(e))
 
-    def process_file(self, file):
+    def process_file(self, vd, page, screenshot=False):
         """ Open local file """
-
+        file = os.path.join(vd, page)
         try:
             self.driver.get('file://{}'.format(file))
         except Exception as e:
             self.quit(m='failed to open file: {}'.format(e))
 
         extract = self.driver.execute_script(self.script)
+
+        if screenshot:
+            f = page.split('.')[0]
+            n = f + '.jpg'
+            sd = os.path.join('data', '_screenshots', n)
+
+            self.driver.save_screenshot(sd)
+
         return extract
 
 
