@@ -11,19 +11,29 @@ class Main():
 
     def local_data_to_db(self):
 
-        local_files = LocalFiles()
-        db_write = DBWriter()
-        crawler = Driver('inject.js')
+        # from web - using this as saving webpage first loses some of the styling
 
-        try:
-            for url, vd, page in local_files.yield_file_paths():
-                src = os.path.join(vd, page)
-                extract = crawler.process_file(vd=vd, page=page, screenshot=True)
+        # crawler = Driver('inject.js')
+        # url = 'https://www.beautybay.com/p/beauty-bay/liquid-crystal-eyeshadow/tourmaline/'
+        # extract = crawler.process_url(url)
+        # db_write = DBWriter()
+        # db_write.store_page_extract(url=url, extract=extract)
 
-                db_write.store_page_extract(url=url, extract=extract)
+        # from local file
 
-        finally:
-            crawler.quit()
+        # local_files = LocalFiles()
+        # db_write = DBWriter()
+        # crawler = Driver('inject.js')
+        #
+        # try:
+        #     for url, vd, page in local_files.yield_file_paths():
+        #         src = os.path.join(vd, page)
+        #         extract = crawler.process_file(vd=vd, page=page, screenshot=True)
+        #
+        #         db_write.store_page_extract(url=url, extract=extract)
+        #
+        # finally:
+        #     crawler.quit()
 
     def db_to_memory(self):
         db_read = DBReader()

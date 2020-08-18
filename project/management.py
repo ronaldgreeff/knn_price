@@ -11,8 +11,9 @@ class LocalFiles():
 
         d = {}
         for vendor in os.listdir('data'):
-            d[vendor] = ([file for file in os.listdir('data/{}'.format(vendor))
-                if file[-4:] == 'html'])
+            if vendor not in ('_screenshots',):
+                d[vendor] = ([file for file in os.listdir('data/{}'.format(vendor))
+                    if file[-4:] == 'html'])
 
         self.pages = d
         return d

@@ -74,7 +74,7 @@ function extractor__extract_texts() {
       computed: util__computed(node)
     };
     texts.push(node.__spider);
-    node.style.border = '1px solid red';
+    // node.style.border = '1px solid red';
   }
   return texts;
 };
