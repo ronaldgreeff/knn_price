@@ -46,8 +46,32 @@ class Computed(BaseModel):
 
 class DBReader():
 
-    def collect_df_data(self):
-        query = Site.select()
+    def initial_df_data(self):
+        # query = (Site
+        #     .select(
+        #         Site.netloc,
+        #         Page.url,
+        #         Page.window_innerHeight,
+        #         Page.window_innerWidth,
+        #         Block.text,
+        #         Block.label,
+        #         Block.width,
+        #         Block.height,
+        #         Block.left,
+        #         Block.top,
+        #         )
+        #     .join(Page)
+        #     .join(Block))
+
+        query = (Block
+            .select(
+                Block.text,
+                CSSKey.key,
+                Computed.val
+            ).join(Computed)
+            .join(CSSKey)
+        )
+
         return query.sql()[0], database
 
 class DBWriter():

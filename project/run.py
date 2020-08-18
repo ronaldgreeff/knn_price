@@ -28,7 +28,7 @@ class Main():
     def db_to_memory(self):
         db_read = DBReader()
         data = DataObj()
-        print(data.df0)
+        data.show()
 
 if __name__ == '__main__':
 
