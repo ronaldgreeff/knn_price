@@ -5,7 +5,7 @@ import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
-class Driver_Config():
+class Chromium_Config():
 
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
@@ -15,12 +15,12 @@ class Driver_Config():
     driver = webdriver.Chrome('chromedriver.exe', chrome_options=options)
     driver.set_window_size(1920, 1080)
 
-# firefox not loading beautybay
+# firefox not loading beautybay. Store Configs
+
+# class FireFox_Config():
 # from selenium.webdriver.firefox.options import Options
 # from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 # from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
-
-# class Driver_Config():
 #     """ For Driver consistency, set things like
 #     headless state, browser driver and window size """
 #
@@ -41,7 +41,7 @@ class Driver_Config():
 #     driver.set_window_size(1920, 1080)
 #     # driver.maximize_window()
 
-class Driver(Driver_Config):
+class Driver(Chromium_Config):
     """ Main driver for navigating to webpage and interacting with it """
 
     def __init__(self, script):
@@ -52,37 +52,26 @@ class Driver(Driver_Config):
     def quit(self, m=None):
         """ Quit the driver. Print a message if provided """
         if m:
-            print('{}'.format(m))
+            print( '{}'.format(m) )
         self.driver.quit()
 
-    def extract_from_document(self, document):
-        """ Navigate to URL or local file (document), inject script, return
+    def get_page(self, page, sleep=10):
+        """ Navigate to URL or local file (page), inject script, return
         extract, catch any exceptions """
         try:
-            self.driver.get(document)
-            time.sleep(10)
+            self.driver.get(page)
+            time.sleep(sleep)
         except Exception as e:
-            self.quit(m='FAILED EXTRACT: {}'.format(e))
+            self.quit(m='get_page failed'.format(e))
 
         extract = self.driver.execute_script(self.script)
         return extract
 
-    def process_url(self, url, store=True, screenshot=False):
-        """ Extract from a url """
-        return self.extract_from_document(url)
+    def save_screenshot(self, location):
+        """ save a screenshot - requires the full path name """
+        self.driver.save_screenshot(location)
 
-    def process_file(self, vd, page, screenshot=False):
+    def process_file(self, dir, filename, screenshot=None):
         """ Extract from local file """
-
-        local_file = 'file://{}'.format( os.path.join(vd, page) )
-
-        extract = self.extract_from_document(local_file)
-
-        if screenshot:
-            f = page.split('.')[0]
-            n = f + '.png'
-            sd = os.path.join('data', '_screenshots', n)
-
-            self.driver.save_screenshot(sd)
-
-        return extract
+        local_file = 'file://{}'.format( os.path.join(dir, filename) )
+        return self.get_page(local_file)
