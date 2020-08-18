@@ -5,7 +5,7 @@ import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 
-class Chromium_Config():
+class Driver_Config():
 
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
@@ -17,7 +17,7 @@ class Chromium_Config():
 
 # firefox not loading beautybay. Store Configs
 
-# class FireFox_Config():
+# class Driver_Config():
 # from selenium.webdriver.firefox.options import Options
 # from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 # from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
@@ -41,7 +41,7 @@ class Chromium_Config():
 #     driver.set_window_size(1920, 1080)
 #     # driver.maximize_window()
 
-class Driver(Chromium_Config):
+class Driver(Driver_Config):
     """ Main driver for navigating to webpage and interacting with it """
 
     def __init__(self, script):

@@ -32,5 +32,5 @@ class LocalFiles():
     def add_url(self, vendor, url):
         """ adds a url to the urls.txt of specified vendor """
         urls = os.path.join(self.data_dir, vendor, 'urls.txt')
-        with open(urls, 'a') as f:
+        with open(urls, 'a+') as f:
             f.write(url)
