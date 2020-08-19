@@ -2,6 +2,21 @@ function util__strip(str) {
   return str.replace(/^\s+|\s+$/g, '');
 }
 
+function util__path(element) {
+  let selector = "";
+  while (element.parentElement) {
+    const siblings = Array.from(element.parentElement.children).filter(
+      e => e.tagName === element.tagName
+    );
+    selector =
+      (siblings.indexOf(element)
+        ? `${element.tagName}:nth-of-type(${siblings.indexOf(element) + 1})`
+        : `${element.tagName}`) + `${selector ? " > " : ""}${selector}`;
+    element = element.parentElement;
+  }
+  return `html > ${selector.toLowerCase()}`;
+};
+
 function util__computed(element) {
   var computed, data, defaults, key, _i, _len;
   defaults = document.defaultView.getComputedStyle(document.body);
@@ -71,7 +86,8 @@ function extractor__extract_texts() {
       text: [util__strip(text.nodeValue)],
       html: node.innerHTML,
       bound: util__bound(node),
-      computed: util__computed(node)
+      computed: util__computed(node),
+      path: util__path(node),
     };
     texts.push(node.__spider);
     // node.style.border = '1px solid red';
@@ -104,7 +120,6 @@ function extract() {
     window_height: window.innerHeight,
     window_width: window.innerWidth,
   };
-
   return data;
 };
 

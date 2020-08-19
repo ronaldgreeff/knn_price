@@ -4,7 +4,17 @@ class LocalFiles():
 
     def __init__(self):
         self.data_dir = os.path.join(os.getcwd(), 'data')
+        self.get_initial_urls()
         self.get_local_pages()
+
+    def get_initial_urls(self):
+        url_records = 'url_record.txt'
+        init_urls = []
+        for u in open(url_records, 'r').readlines():
+            u = u.strip()
+            if u:
+                init_urls.append(u)
+        self.init_urls = init_urls
 
     def get_local_pages(self):
         """ Get folder (vendor) and file (html) list for pages in /data

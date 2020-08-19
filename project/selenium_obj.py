@@ -8,7 +8,10 @@ from selenium.webdriver.chrome.service import Service
 class Driver_Config():
 
     options = webdriver.ChromeOptions()
+
     options.add_argument('--ignore-certificate-errors')
+    options.add_argument("user-data-dir=C:\\Path") #Path to your chrome profile
+
     options.add_experimental_option("useAutomationExtension", False)
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
