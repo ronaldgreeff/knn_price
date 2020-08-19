@@ -4,12 +4,13 @@ import time
 
 from models import DBWriter, DBReader
 from management import LocalFiles
-from selenium_obj import Driver
 from pandas_obj import DataObj
 import helpers
 
 
 def web_data_to_db():
+    # TODO: shouldn't be here, move (and in local_data_to_db())
+    from selenium_obj import Driver
 
     local_files = LocalFiles()
     db_write = DBWriter()
@@ -28,7 +29,9 @@ def web_data_to_db():
     finally:
         crawler.quit()
 
+
 def local_data_to_db():
+    from selenium_obj import Driver
 
     local_files = LocalFiles()
     db_write = DBWriter()
@@ -46,13 +49,14 @@ def local_data_to_db():
     finally:
         crawler.quit()
 
+
 def db_to_memory():
     db_read = DBReader()
     data = DataObj()
-    data.show()
+    print(data.df0.head())
+
 
 if __name__ == '__main__':
 
-    # local_data_to_db()
-    web_data_to_db()
-    # db_to_memory()
+    # web_data_to_db()
+    db_to_memory()

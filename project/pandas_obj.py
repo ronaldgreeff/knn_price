@@ -7,10 +7,13 @@ class DataObj:
         query, con = DBReader().initial_df_data()
         self.df0 = pd.read_sql(query, con)
 
-    def show(self):
+    def show_all(self):
         with pd.option_context(
             'display.max_rows', None,
             'display.max_columns', None,
             'display.width', 1000,
             ):
             print(self.df0)
+
+    def pre_process(self):
+        pass

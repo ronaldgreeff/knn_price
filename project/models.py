@@ -46,6 +46,7 @@ class Computed(BaseModel):
     val = CharField(null=True)
 
 class DBReader():
+    """ Manages reading from database """
 
     def initial_df_data(self):
         # query = (Site
@@ -76,6 +77,7 @@ class DBReader():
         return query.sql()[0], database
 
 class DBWriter():
+    """ Manages writing to db including initial setup of tables """
 
     def __init__(self):
         """ build db """
@@ -85,18 +87,10 @@ class DBWriter():
             database.create_tables([Site, Page, Block, CSSKey, Computed])
         database.close()
 
-    # def clean_links(self, netloc, links):
-    #     """ returns only links that match netloc/domain provided """
-    #     cleaned_links = []
-    #     for link in links:
-    #         parsed_link = urlparse(link)
-    #         if parsed_link[1] == netloc:
-    #             cleaned_links.append(urlunparse(parsed_link))
-    #
-    #     return cleaned_links
-
     def store_page_extract(self, url, extract, purge_record=True):
-        """ store the extract """
+        """ prepare extracted data then import it as part of a transaction
+        which can be rollbacked in case of exception """
+
         parsed_url = helpers.urlparse(url)
         netloc = parsed_url[1]
         clean_url = helpers.unparse_url(parsed_url)
@@ -105,8 +99,6 @@ class DBWriter():
         for link in extract['links']:
             if helpers.link_in_netloc(netloc, link):
                 valid_links.append(link)
-
-        # cleaned_links = self.clean_links(parsed_url[1], extract['links'])
 
         with database.atomic() as transaction:
             # to rollback if exception
