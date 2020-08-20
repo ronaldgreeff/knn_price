@@ -89,6 +89,31 @@ class DataObj:
         print([len(temp[i]) for i in temp.keys()])
         print(temp.keys())
         print(d.keys())
+
+        d3 = {}
+        for i in temp:
+            row = temp[i]
+
+            d3[i] = []
+            l = d3[i]
+
+            for key in css_keys:
+                if row.get(key):
+                    l.append(key)
+                else:
+                    l.append(None)
+        print(len(css_keys))
+        print([len(d3[i]) for i in d3])
+        t = []
+        for i in d3:
+            c = 0
+            for x in d3[i]:
+                if x != None:
+                    c+=1
+            t.append(c)
+        print(t)
+
+
         # ndf = {'block_id': int(),'netloc': [],'url': [], 'page_height': [],
         # 'page_width': [],'text': [],'top': [],'width': [],'height': [],
         # 'label': [],}

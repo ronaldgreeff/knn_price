@@ -3,6 +3,7 @@ backup/
 data/
 data.7z
 *.db
+*.sqbpro
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
