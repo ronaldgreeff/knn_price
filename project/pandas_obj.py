@@ -81,47 +81,64 @@ class DataObj:
                 'height': row[9],
                 'label': row[10],
             }
+
             if not temp.get(block_id):
                 temp[block_id] = {}
 
             temp[block_id][row[11]] = row[12]
 
-        print([len(temp[i]) for i in temp.keys()])
-        print(temp.keys())
-        print(d.keys())
+        # print([len(temp[i]) for i in temp.keys()])
+        # print(temp.keys())
+        # print(d.keys())
 
-        d3 = {}
         for i in temp:
             row = temp[i]
-
-            d3[i] = []
-            l = d3[i]
-
             for key in css_keys:
-                if row.get(key):
-                    l.append(key)
-                else:
-                    l.append(None)
-        print(len(css_keys))
-        print([len(d3[i]) for i in d3])
-        t = []
-        for i in d3:
-            c = 0
-            for x in d3[i]:
-                if x != None:
-                    c+=1
-            t.append(c)
-        print(t)
+                d[i][key] = None
+                pos = d[i][key]
+                val = row.get(key)
+                print(key, pos, val)
+                if val:
+                    pos = val
 
+        print(d[1].keys())
+        print(df(d).transpose())
 
-        # ndf = {'block_id': int(),'netloc': [],'url': [], 'page_height': [],
-        # 'page_width': [],'text': [],'top': [],'width': [],'height': [],
-        # 'label': [],}
+            # d3[i] = []# needs to be  adict
+            # l = d3[i]
+            #
+            # for key in css_keys:
+            #     val = row.get(key)
+            #     if val:
+            #         l.append(val)
+            #     else:
+            #         l.append(None)
+
+        # print(len(css_keys))
+        # print([len(d3[i]) for i in d3])
+        # t = []
+        # for i in d3:
+        #     c = 0
+        #     for x in d3[i]:
+        #         if x != None:
+        #             c+=1
+        #     t.append(c)
+        # print(t)
+        #
+        # for i in d3:
+        #     print(i, (d3[i]))
+        #
+        # print(d3)
 
         # process:
         # d1 = {"block_id": [v,...], ... | "css_key": [v, ...]}
         # d2 = {"block_id": {csskey: v}} -> d3 = {"block_id": {csskey: [validated_list]}}
         # d1['block_id'][ d3['block_id'] ] = d3['block_id']['csskey']
+
+
+        # ndf = {'block_id': int(),'netloc': [],'url': [], 'page_height': [],
+        # 'page_width': [],'text': [],'top': [],'width': [],'height': [],
+        # 'label': [],}
 
         # temp = {}
         # for i, row in data.iterrows():
