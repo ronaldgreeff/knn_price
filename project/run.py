@@ -51,9 +51,8 @@ def local_data_to_db():
 
 
 def db_to_memory():
-    db_read = DBReader()
     data = DataObj()
-    print(data.df0.head())
+    data.init_df0()
 
 
 if __name__ == '__main__':

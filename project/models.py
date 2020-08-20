@@ -16,7 +16,7 @@ class Site(BaseModel):
     netloc = CharField(null=False, unique=True)
 
 class Page(BaseModel):
-    site = ForeignKeyField(Site, backref='records')
+    site = ForeignKeyField(Site, backref='records',)# on_delete='CASCADE')
     url = CharField(null=False, unique=True)
     visited = BooleanField(default=False)
     created = DateTimeField(default=datetime.now())
@@ -45,36 +45,19 @@ class Computed(BaseModel):
     key = ForeignKeyField(CSSKey)
     val = CharField(null=True)
 
+
+
 class DBReader():
     """ Manages reading from database """
 
-    def initial_df_data(self):
-        # query = (Site
-        #     .select(
-        #         Site.netloc,
-        #         Page.url,
-        #         Page.window_innerHeight,
-        #         Page.window_innerWidth,
-        #         Block.text,
-        #         Block.label,
-        #         Block.width,
-        #         Block.height,
-        #         Block.left,
-        #         Block.top,
-        #         )
-        #     .join(Page)
-        #     .join(Block))
+    def con(self):
+        return database
+        # return query.sql()[0], database
 
-        query = (Block
-            .select(
-                Block.text,
-                CSSKey.key,
-                Computed.val
-            ).join(Computed)
-            .join(CSSKey)
-        )
-
-        return query.sql()[0], database
+    def q(self, query):
+        """ executes sql query, fetches all """
+        cursor = database.execute_sql(query)
+        return cursor.fetchall()
 
 class DBWriter():
     """ Manages writing to db including initial setup of tables """

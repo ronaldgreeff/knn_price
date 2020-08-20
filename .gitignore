@@ -1,4 +1,5 @@
 # Project specific
+backup/
 data/
 data.7z
 *.db
