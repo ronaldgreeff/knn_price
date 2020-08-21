@@ -119,6 +119,22 @@ function extract() {
   data['env'] = {
     window_height: window.innerHeight,
     window_width: window.innerWidth,
+    defaults: function(){
+      var dflt = document.defaultView.getComputedStyle(document.body);
+      d = {};
+      for (_i = 0, _len = dflt.length; _i < _len; _i++) {
+          key = dflt[_i];
+          if (key === 'width' || key === 'height' || key === 'top' || key === 'left' || key === 'right' || key === 'bottom') {
+            continue;
+          }
+          if (key.charAt(0) === '-') {
+            continue;
+          }
+          d[key] = dflt[key];
+      }
+      return d
+    }()
+
   };
   return data;
 };

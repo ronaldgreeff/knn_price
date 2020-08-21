@@ -25,6 +25,7 @@ class Page(BaseModel):
     is_sale = BooleanField(null=True)
     window_innerHeight = IntegerField()
     window_innerWidth = IntegerField()
+    defaults = CharField()
 
 class Block(BaseModel):
     page = ForeignKeyField(Page, on_delete='CASCADE')
@@ -102,7 +103,9 @@ class DBWriter():
                         site=site_obj,
                         url=clean_url,
                         window_innerHeight=extract['env']['window_height'],
-                        window_innerWidth=extract['env']['window_width'],)
+                        window_innerWidth=extract['env']['window_width'],
+                        defaults=json.dumps(extract['env']['defaults'])
+                        )
 
                 for link in valid_links:
                     try:
