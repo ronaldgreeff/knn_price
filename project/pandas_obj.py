@@ -110,10 +110,14 @@ class DataObj:
     def pre_process(self):
 
         def rgb_2_1d(rgb_string, sat_thr=0, val_thr_b=0, val_thr_u=1):
-            """ figure out the closest centreline of rgb values (mean)
-            then for each value figure out the abs distance from centre
-            multiply values to get volume. larger volume = more colour
-            scale 0 - 1
+            """
+            hue: ignored (doesn't matter what the colour)
+            sat: dull (low) to intense (high) colour
+            val: black (low) to white (high) lightness
+
+            convert rgb to hsv
+            if below sat thresh (dull) or either extreme of val (really
+            white or really black), considered no colour and = 0
             """
             rgb = rgb_string[0]
             text = rgb_string[1]
@@ -133,28 +137,19 @@ class DataObj:
             sat = hsv[1]
             val = hsv[2]
 
-            result = ''
-
             sat_thr = 0.2
-            val_thr_b = 0.2
-            val_thr_u = .8
+            val_thr_b = 0.1
+            val_thr_u = 1
 
-            if sat < sat_thr:
-                result = 'n'
-            elif val_thr_b < val < val_thr_u:
-                result = 'n'
+            # if sat < sat_thr or val < val_thr:
+            if sat < sat_thr or val_thr_b > val or val > val_thr_u:
+                result = 0
+            else:
+                result = 1
 
-            # print(rgb_coords, hsv)
-
-            print('{} {}: {:.2f}, {:.2f}, {:.2f}'.format(result, text, hue, sat, val))
-
-            # m = np.mean(list_of_numbers)
-            # # x = sum([(abs(m-i)/255) for i in list_of_numbers])
-            # x = [(abs(m-i)) for i in list_of_numbers]
-            # r = sum(x)/m
-            # o = 'colour' if r>thresh else 'noir'
-            # print(o, text, r, rgb)
-            # return r
+            # print('{} {}: sat: {:.2f} {}, val: {:.2f} {}'.format(result, text, sat, (sat<sat_thr), val, (val<val_thr)))
+            print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
+                result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
 
         thresh = rgb_2_1d(('rgb(255, 222, 222)', 'super light'))
         print('-------')
