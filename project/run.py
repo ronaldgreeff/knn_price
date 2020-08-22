@@ -53,7 +53,9 @@ def local_data_to_db():
 def db_to_memory():
     data = DataObj()
     data.create_pd_from_page(page_id=1)
+    # print(data.css_keys)
     # data.show_css_key_vals()
+    data.pre_process()
 
 
 if __name__ == '__main__':
