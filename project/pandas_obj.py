@@ -9,9 +9,8 @@ class DataObj:
 
     def __init__(self, css_keys=None):
         self.db = DBReader()
-
-        if not css_keys:
-            self.css_keys = self.get_all_keys()
+        self.css_keys = css_keys if css_keys else self.get_all_keys()
+        self.df = None
 
     def get_all_keys(self):
         return [i[0] for i in self.db.q(""" SELECT key from csskey """)]
@@ -96,7 +95,7 @@ class DataObj:
         for css_key in self.css_keys:
             print('{}, def:{}\n{}'.format(
                 css_key, self.page_defaults[css_key],
-                self.df.loc[self.df[css_key] != 0][css_key],
+                (self.df.loc[self.df[css_key] != 0][css_key]),
                 ))
 
     def show_all(self):
@@ -105,27 +104,34 @@ class DataObj:
             'display.max_columns', None,
             'display.width', 1000,
             ):
-            print(self.df0)
+            print(self.df)
+
 
     def pre_process(self):
 
-        def rgb_2_1d(rgb_string, sat_thr=0, val_thr_b=0, val_thr_u=1):
-            """
+        def str_px_to_int(string_px):
+            """ remove 'px' from string pixel value and return integer """
+            return int(string_px[:-2])
+
+        def rgb_to_coords(rgb_string):
+            """ Convert rgb string to (decimal) coords """
+            numbers_as_s = rgb_string[4:-1]
+            numbers_as_l = numbers_as_s.split(',')
+
+            return [(int(i)/255) for i in numbers_as_l]
+
+        def rgb_2_1d(rgb_string, sat_thr=0.2, val_thr_b=0.1, val_thr_u=1):
+            """ Determine if rgb value is colourful or not
+            first convert rgb to hsv, then if sat below sat thresh (dull)
+            or val beyond either extreme of val (really white or really black),
+            considered no colour and assigned 0, else assigned 1.
+
             hue: ignored (doesn't matter what the colour)
             sat: dull (low) to intense (high) colour
             val: black (low) to white (high) lightness
-
-            convert rgb to hsv
-            if below sat thresh (dull) or either extreme of val (really
-            white or really black), considered no colour and = 0
             """
-            rgb = rgb_string[0]
-            text = rgb_string[1]
-            numbers_as_s = rgb[4:-1]
-            numbers_as_l = numbers_as_s.split(', ')
-            list_of_numbers = [int(i) for i in numbers_as_l]
 
-            rgb_coords = [(i/255) for i in list_of_numbers]
+            rgb_coords = rgb_to_coords(rgb_string)
 
             hsv = colorsys.rgb_to_hsv(
                 r=rgb_coords[0],
@@ -137,43 +143,41 @@ class DataObj:
             sat = hsv[1]
             val = hsv[2]
 
-            sat_thr = 0.2
-            val_thr_b = 0.1
-            val_thr_u = 1
-
-            # if sat < sat_thr or val < val_thr:
             if sat < sat_thr or val_thr_b > val or val > val_thr_u:
                 result = 0
             else:
                 result = 1
 
-            # print('{} {}: sat: {:.2f} {}, val: {:.2f} {}'.format(result, text, sat, (sat<sat_thr), val, (val<val_thr)))
-            print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
-                result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
+            return result
 
-        thresh = rgb_2_1d(('rgb(255, 222, 222)', 'super light'))
-        print('-------')
-        for i in (
-            ('rgb(0, 0, 0)', 'black',),
-            ('rgb(255, 255, 255)', 'white',),
-            ('rgb(128, 64, 64)', '(dead centre)',),
-            ('rgb(255, 0, 0)', 'red',),
-            ('rgb(0, 255, 0)', 'green',),
-            ('rgb(0, 0, 255)', 'blue',),
-            ('rgb(128, 0, 0)', 'red (mid right)',),
-            ('rgb(77, 38, 38)', 'dark red',),
-            ('rgb(0, 106, 184)', 'data blue',),
-            ('rgb(255, 128, 128)', 'pink (center top)',),
-            ('rgb(255, 207, 207)', 'pink far left',),
-            ('rgb(255, 186, 186)', 'pink left',),
-            ('rgb(255, 15, 15)', 'pink right',),
-            ('rgb(128, 128, 128)', 'grey (mid left)',),
-            ('rgb(25, 13, 13)', 'basically black (center bottom)',),
-            ('rgb(128, 115, 115)', 'basically grey (center left)',),
-            ('rgb(242, 242, 242)', 'data (white)',),
-            ('rgb(89, 88, 89)', 'data darkish grey',),
-            ('rgb(102, 102, 102)', 'data lightish grey',),
-            ('rgb(194, 194, 194)', 'data light grey',),
-            ('rgb(51, 51, 51)', 'data dark grey',),
-        ):
-            rgb_2_1d(i)#, thresh=thresh)
+        def_font_size = str_px_to_int(self.page_defaults['font-size'])
+        def_font_weight = int(self.page_defaults['font-weight'])
+        def_text_transform = self.page_defaults['text-transform']
+
+
+
+            # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
+            #     result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
+        # for i in (
+        #     ('rgb(0, 0, 0)', 'black',),
+        #     ('rgb(255, 255, 255)', 'white',),
+        #     ('rgb(128, 64, 64)', '(dead centre)',),
+        #     ('rgb(255, 0, 0)', 'red',),
+        #     ('rgb(0, 255, 0)', 'green',),
+        #     ('rgb(0, 0, 255)', 'blue',),
+        #     ('rgb(128, 0, 0)', 'red (mid right)',),
+        #     ('rgb(77, 38, 38)', 'dark red',),
+        #     ('rgb(0, 106, 184)', 'data blue',),
+        #     ('rgb(255, 128, 128)', 'pink (center top)',),
+        #     ('rgb(255, 207, 207)', 'pink far left',),
+        #     ('rgb(255, 186, 186)', 'pink left',),
+        #     ('rgb(255, 15, 15)', 'pink right',),
+        #     ('rgb(128, 128, 128)', 'grey (mid left)',),
+        #     ('rgb(25, 13, 13)', 'basically black (center bottom)',),
+        #     ('rgb(128, 115, 115)', 'basically grey (center left)',),
+        #     ('rgb(242, 242, 242)', 'data (white)',),
+        #     ('rgb(89, 88, 89)', 'data darkish grey',),
+        #     ('rgb(102, 102, 102)', 'data lightish grey',),
+        #     ('rgb(194, 194, 194)', 'data light grey',),
+        #     ('rgb(51, 51, 51)', 'data dark grey',),
+        # )

@@ -51,11 +51,15 @@ def local_data_to_db():
 
 
 def db_to_memory():
-    data = DataObj()
+    css_keys = ['color', 'font-size', 'font-weight', 'text-transform',
+        # 'text-align', 'vertical-align', 'text-shadow', 'font-family',
+        ]
+    data = DataObj(css_keys=css_keys)
     data.create_pd_from_page(page_id=1)
     # print(data.css_keys)
-    # data.show_css_key_vals()
+    data.show_css_key_vals()
     data.pre_process()
+    print(data.show_all())
 
 
 if __name__ == '__main__':
