@@ -68,18 +68,19 @@ class DataObj:
             temp[block_id][row[12]] = row[13]
 
         # iterate over temp index AND css_keys, adding
-        # val if val else 0 into each d[index][css_key]
+        # val if val else page_default into each d[index][css_key]
+
+        self.page_defaults = json.loads(page_defaults)
 
         for i in temp:
             row = temp[i]
             for key in self.css_keys:
-                d[i][key] = 0
+                d[i][key] = self.page_defaults[key]
                 val = row.get(key)
                 if val:
                     d[i][key] = val
 
         self.df = df(d).transpose()
-        self.page_defaults = json.loads(page_defaults)
 
         # todo: write tests:
         # print(temp[35]['display'])
@@ -111,7 +112,10 @@ class DataObj:
 
         def str_px_to_int(string_px):
             """ remove 'px' from string pixel value and return integer """
-            if string_px[:2] == 'px':
+            # if type(string_px) == type(int()):
+            #     return string_px
+            # elif type(string_px) == type(str()):
+            if string_px[-2:] == 'px':
                 return int(string_px[:-2])
 
         def rgb_to_coords(rgb_string):
@@ -132,28 +136,22 @@ class DataObj:
             val: black (low) to white (high) lightness
             """
 
-            result = 0
-            if type(rgb_string) == type(str):
+            rgb_coords = rgb_to_coords(rgb_string)
 
-                rgb_coords = rgb_to_coords(rgb_string)
+            hsv = colorsys.rgb_to_hsv(
+                r=rgb_coords[0],
+                g=rgb_coords[1],
+                b=rgb_coords[2],
+                )
 
-                hsv = colorsys.rgb_to_hsv(
-                    r=rgb_coords[0],
-                    g=rgb_coords[1],
-                    b=rgb_coords[2],
-                    )
+            hue = hsv[0]
+            sat = hsv[1]
+            val = hsv[2]
 
-                hue = hsv[0]
-                sat = hsv[1]
-                val = hsv[2]
-
-                if sat > sat_thr or (val_thr_b < val and val < val_thr_u):
-                    result = 1
-
-            # if sat < sat_thr or val_thr_b > val or val > val_thr_u:
-            #     result = 0
-            # else:
-            #     result = 1
+            if sat < sat_thr or val_thr_b > val or val > val_thr_u:
+                result = 0
+            else:
+                result = 1
 
             return result
 
@@ -181,31 +179,34 @@ class DataObj:
                     symbols += 1
                 len += 1
 
-            return len, chars, digits, symbols, spaces
+            return pd.Series({'len': len, 'chars': chars, 'digits': digits, 'symbols': symbols, 'spaces': spaces})
 
-        dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
-        dflt_font_weight = int(self.page_defaults['font-weight'])
-        dflt_text_transform = self.page_defaults['text-transform']
+        def text_transform(ttv):
+            return 1 if ttv == 'capitalize' or ttv == 'uppercase' else 0
+
+        # dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
+        # dflt_font_weight = int(self.page_defaults['font-weight'])
+        # dflt_text_transform = self.page_defaults['text-transform']
 
         print(self.show_all())
-
-        ndf = df()
-
+        print(self.df.columns)
+        print('------------------------------------------------------')
 
         # ndf = self.df.apply({
         #     # 'text': lambda v: v/self.page_defaults['page_height'],
         # })
-        # ndf['top'] = self.df['top']/self.df['page_height']
 
-        ndf['x'] = (self.df['top'] + (self.df['height']/2))/self.df['page_height']
-        ndf['y'] = (self.df['left'] + (self.df['width']/2))/self.df['page_width']
-        ndf['v'] = (self.df['width']*self.df['height'])/(self.df['page_height']*self.df['page_width'])
+        # ndf['x'] = (self.df['top'] + (self.df['height']/2) ) /self.df['page_height']
+        # ndf['y'] = (self.df['left'] + (self.df['width']/2) ) /self.df['page_width']
+        # ndf['v'] = (self.df['width']*self.df['height']) /(self.df['page_width']*self.df['page_height'])
 
-        # ndf['text']
-        ndf['color'] = rgb_to_1d(self.df['color'].apply(rgb_to_1d))
-        ndf['font-size'] =
-        ndf['font-weight'] =
-        ndf['text-transform'] =
+        # ndf = df()
+        ndf = self.df['text'].apply(text_to_features)
+
+        ndf['color'] = self.df['color'].apply(rgb_to_1d)
+        ndf['font-size'] = ( self.df['font-size'].apply(str_px_to_int)/str_px_to_int(self.page_defaults['font-size']) )
+        ndf['font-weight'] = self.df['font-weight'].astype(int)/int(self.page_defaults['font-weight'])
+        ndf['text-transform'] = self.df['text-transform'].apply(text_transform)
         print(ndf)
 
         # ndf.apply({
