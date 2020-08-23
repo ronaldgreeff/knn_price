@@ -59,7 +59,14 @@ def db_to_memory():
     # print(data.css_keys)
     data.show_css_key_vals()
     data.pre_process()
-    print(data.show_all())
+    # print(data.show_all())
+    # def ff(x):
+    #     return x+1
+    # d = data.df.apply({
+    #     'page_height': ff,
+    #     'page_width': ff,
+    #     })
+    # print(d)
 
 
 if __name__ == '__main__':

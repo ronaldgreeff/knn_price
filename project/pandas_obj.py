@@ -120,7 +120,7 @@ class DataObj:
 
             return [(int(i)/255) for i in numbers_as_l]
 
-        def rgb_2_1d(rgb_string, sat_thr=0.2, val_thr_b=0.1, val_thr_u=1):
+        def rgb_to_1d(rgb_string, sat_thr=0.2, val_thr_b=0.1, val_thr_u=1):
             """ Determine if rgb value is colourful or not
             first convert rgb to hsv, then if sat below sat thresh (dull)
             or val beyond either extreme of val (really white or really black),
@@ -150,10 +150,52 @@ class DataObj:
 
             return result
 
-        def_font_size = str_px_to_int(self.page_defaults['font-size'])
-        def_font_weight = int(self.page_defaults['font-weight'])
-        def_text_transform = self.page_defaults['text-transform']
+        def text_to_features(texts):
+            """
+            Params: a list of text
+            Output: len, digits, symbols, chars, spaces
+            """
+            len = 0
+            chars = 0
+            digits = 0
+            symbols = 0
+            spaces = 0
 
+            text = ''.join(texts)
+
+            for t in text:
+                if t.isalpha():
+                    chars += 1
+                elif t.isdigit():
+                    digits += 1
+                elif t.isspace():
+                    spaces += 1
+                else:
+                    symbols += 1
+                len += 1
+
+            return len, chars, digits, symbols, spaces
+
+        dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
+        dflt_font_weight = int(self.page_defaults['font-weight'])
+        dflt_text_transform = self.page_defaults['text-transform']
+
+        print(self.show_all())
+
+        ndf = df()
+
+
+        # ndf = self.df.apply({
+        #     # 'text': lambda v: v/self.page_defaults['page_height'],
+        # })
+        # ndf['top'] = self.df['top']/self.df['page_height']
+
+        ndf['x'] = (self.df['top'] + (self.df['height']/2))/self.df['page_height']
+        ndf['y'] = (self.df['left'] + (self.df['width']/2))/self.df['page_width']
+
+        ndf['v'] = (self.df['width']*self.df['height'])/(self.df['page_height']*self.df['page_width'])
+
+        print(ndf)
 
 
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
