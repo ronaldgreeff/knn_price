@@ -111,7 +111,8 @@ class DataObj:
 
         def str_px_to_int(string_px):
             """ remove 'px' from string pixel value and return integer """
-            return int(string_px[:-2])
+            if string_px[:2] == 'px':
+                return int(string_px[:-2])
 
         def rgb_to_coords(rgb_string):
             """ Convert rgb string to (decimal) coords """
@@ -131,22 +132,28 @@ class DataObj:
             val: black (low) to white (high) lightness
             """
 
-            rgb_coords = rgb_to_coords(rgb_string)
+            result = 0
+            if type(rgb_string) == type(str):
 
-            hsv = colorsys.rgb_to_hsv(
-                r=rgb_coords[0],
-                g=rgb_coords[1],
-                b=rgb_coords[2],
-                )
+                rgb_coords = rgb_to_coords(rgb_string)
 
-            hue = hsv[0]
-            sat = hsv[1]
-            val = hsv[2]
+                hsv = colorsys.rgb_to_hsv(
+                    r=rgb_coords[0],
+                    g=rgb_coords[1],
+                    b=rgb_coords[2],
+                    )
 
-            if sat < sat_thr or val_thr_b > val or val > val_thr_u:
-                result = 0
-            else:
-                result = 1
+                hue = hsv[0]
+                sat = hsv[1]
+                val = hsv[2]
+
+                if sat > sat_thr or (val_thr_b < val and val < val_thr_u):
+                    result = 1
+
+            # if sat < sat_thr or val_thr_b > val or val > val_thr_u:
+            #     result = 0
+            # else:
+            #     result = 1
 
             return result
 
@@ -192,10 +199,19 @@ class DataObj:
 
         ndf['x'] = (self.df['top'] + (self.df['height']/2))/self.df['page_height']
         ndf['y'] = (self.df['left'] + (self.df['width']/2))/self.df['page_width']
-
         ndf['v'] = (self.df['width']*self.df['height'])/(self.df['page_height']*self.df['page_width'])
 
+        # ndf['text']
+        ndf['color'] = rgb_to_1d(self.df['color'].apply(rgb_to_1d))
+        ndf['font-size'] =
+        ndf['font-weight'] =
+        ndf['text-transform'] =
         print(ndf)
+
+        # ndf.apply({
+        #     # 'text':
+        #     'color': rgb_to_1d(self.df['color'].apply(rgb_to_1d))
+        # })
 
 
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
