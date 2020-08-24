@@ -99,13 +99,13 @@ class DataObj:
                 (self.df.loc[self.df[css_key] != 0][css_key]),
                 ))
 
-    def show_all(self):
+    def show_all(self, df):
         with pd.option_context(
             'display.max_rows', None,
             'display.max_columns', None,
             'display.width', 1000,
             ):
-            print(self.df)
+            print(df)
 
 
     def pre_process(self):
@@ -163,9 +163,10 @@ class DataObj:
             len = 0
             chars = 0
             digits = 0
-            symbols = 0
             spaces = 0
+            denom = 0
 
+            texts = json.loads(texts)
             text = ''.join(texts)
 
             for t in text:
@@ -176,43 +177,37 @@ class DataObj:
                 elif t.isspace():
                     spaces += 1
                 else:
-                    symbols += 1
+                    if t in ('£', '$'):
+                        denom += 1
                 len += 1
 
-            return pd.Series({'len': len, 'chars': chars, 'digits': digits, 'symbols': symbols, 'spaces': spaces})
+            return pd.Series({
+                'str': text,
+                'len': len,
+                'chars': (chars/len),
+                'digits': (digits/len),
+                'spaces': (spaces/len),
+                'denom': denom,
+                })
 
         def text_transform(ttv):
             return 1 if ttv == 'capitalize' or ttv == 'uppercase' else 0
 
-        # dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
-        # dflt_font_weight = int(self.page_defaults['font-weight'])
-        # dflt_text_transform = self.page_defaults['text-transform']
+        dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
+        dflt_font_weight = int(self.page_defaults['font-weight'])
 
-        print(self.show_all())
-        print(self.df.columns)
-        print('------------------------------------------------------')
-
-        # ndf = self.df.apply({
-        #     # 'text': lambda v: v/self.page_defaults['page_height'],
-        # })
-
-        # ndf['x'] = (self.df['top'] + (self.df['height']/2) ) /self.df['page_height']
-        # ndf['y'] = (self.df['left'] + (self.df['width']/2) ) /self.df['page_width']
-        # ndf['v'] = (self.df['width']*self.df['height']) /(self.df['page_width']*self.df['page_height'])
-
-        # ndf = df()
         ndf = self.df['text'].apply(text_to_features)
-
+        ndf['label'] = self.df['label']
         ndf['color'] = self.df['color'].apply(rgb_to_1d)
-        ndf['font-size'] = ( self.df['font-size'].apply(str_px_to_int)/str_px_to_int(self.page_defaults['font-size']) )
-        ndf['font-weight'] = self.df['font-weight'].astype(int)/int(self.page_defaults['font-weight'])
+        ndf['font-size'] = self.df['font-size'].apply(str_px_to_int) / dflt_font_size
+        ndf['font-weight'] = self.df['font-weight'].astype(int) / dflt_font_weight
         ndf['text-transform'] = self.df['text-transform'].apply(text_transform)
-        print(ndf)
 
-        # ndf.apply({
-        #     # 'text':
-        #     'color': rgb_to_1d(self.df['color'].apply(rgb_to_1d))
-        # })
+        ndf['x'] = (self.df['top'] + (self.df['height']/2) ) / self.df['page_height']
+        ndf['y'] = (self.df['left'] + (self.df['width']/2) ) / self.df['page_width']
+        ndf['v'] = (self.df['width']/self.df['page_width'])*(self.df['height']/self.df['page_height'])
+
+        return ndf
 
 
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
