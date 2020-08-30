@@ -10,7 +10,6 @@ class DataObj:
     def __init__(self, css_keys=None):
         self.db = DBReader()
         self.css_keys = css_keys if css_keys else self.get_all_keys()
-        self.df = None
 
     def get_all_keys(self):
         return [i[0] for i in self.db.q(""" SELECT key from csskey """)]
@@ -80,7 +79,7 @@ class DataObj:
                 if val:
                     d[i][key] = val
 
-        self.df = df(d).transpose()
+        return df(d).transpose()
 
         # todo: write tests:
         # print(temp[35]['display'])
@@ -91,6 +90,15 @@ class DataObj:
         # print(d.keys())
         # print(d[1].keys())
         # print(df(d).transpose())
+
+    def get_dataframes(self, page_ids):
+        dfs = []
+        for page_id in page_ids:
+            dfs.append(self.create_pd_from_page(page_id))
+
+        self.df = pd.concat(dfs)
+
+    # Info utils #
 
     def show_css_key_vals(self):
         for css_key in self.css_keys:
@@ -107,6 +115,7 @@ class DataObj:
             ):
             print(df)
 
+    # Preprocess #
 
     def pre_process(self):
 
@@ -116,7 +125,7 @@ class DataObj:
             #     return string_px
             # elif type(string_px) == type(str()):
             if string_px[-2:] == 'px':
-                return int(string_px[:-2])
+                return float(string_px[:-2])
 
         def rgb_to_coords(rgb_string):
             """ Convert rgb string to (decimal) coords """
@@ -193,6 +202,9 @@ class DataObj:
         def text_transform(ttv):
             return 1 if ttv == 'capitalize' or ttv == 'uppercase' else 0
 
+
+        # process #
+
         dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
         dflt_font_weight = int(self.page_defaults['font-weight'])
 
@@ -207,7 +219,7 @@ class DataObj:
         ndf['y'] = (self.df['left'] + (self.df['width']/2) ) / self.df['page_width']
         ndf['v'] = (self.df['width']/self.df['page_width'])*(self.df['height']/self.df['page_height'])
 
-        return ndf
+        self.ppdf = ndf
 
 
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
