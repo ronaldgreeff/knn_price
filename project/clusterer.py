@@ -6,54 +6,78 @@ class clusterer:
     # def __init__(self, df):
     #     self.npa = df.to_numpy()
 
-    def get_params(self, np_array, true_cluster_indices):
-        """ truth labels holds the index of 1 set of clustered labels """
+    def get_cluster_boundaries(self):#, X, true_cluster_indices):
+        """ Determine the min and max eps to use, using partially labelled data
+            Reasoning:
+            A single product title will be present on each `Page` dataframe. If you
+            stack Pages, Titles should be there own cluster. min_samples therefor
+            == len(Pages) or len(rows with label "Title") / a list of
+            true_cluster_indices. You can then calc the min_eps (the val needed
+            for each value "Title" datapoint to be within a single cluster)
+            and the max_eps (the val a step before the cluster includes something
+            other than a "Title" datapoint)
+        """
 
-        # start at a low eps
-        # set min samples equal to len(true_cluster_indices)
-        # draw clusters
-        # while len of set(labels at true_cluster_indices) > 1:
-        #   increase eps by small amount
-        # once len is 1, set the min_eps value
-        # while the occurences of true_cluster labels < len true_cluster_indices:
-        #   set max_eps
-        #   increase eps by small amount
+        # t_labels = ['a', 'a', 'p', 'p', 'o', 't', 't']
+        true_cluster_indices = [2, 3]
+        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
 
         eps = 0.01
+        steps = 0.01
+
         min_eps = 0
         max_eps = 0
         min_samples = len(true_cluster_indices)
-        labels = []
         tci_labels = []
+        labels = []
 
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+
+        # len tci_labels will init with 0 and then be >1. We want to make it 1.
         while len(set(tci_labels)) != 1:
-            dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+            dbscan.eps = eps
             model = dbscan.fit(X)
             labels = model.labels_
-            eps += 0.01
+            #                                                     ignore outliers
             tci_labels = [labels[i] for i in true_cluster_indices if labels[i] >= 0]
+            eps += steps
 
         min_eps = eps
         label = set(tci_labels).pop()
 
+        # check the model labels for the occurences of label. Increment eps
+        # until an additional datapoint is added to the label cluster
         while list(labels).count(label) <= len(true_cluster_indices):
-            dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+            dbscan.eps = eps
             model = dbscan.fit(X)
             labels = model.labels_
-            eps += 0.01
+            eps += steps
 
         max_eps = eps
 
-        print(min_eps, max_eps)
+        return min_eps, max_eps
+
+    def get_labelled_data(self):
+        """ Using the pre-caclulated eps, get labelled clusters from the data """
+        min_samples = 2
+        a = 7.089999999999893 # [ 0  0  1  1 -1 -1 -1] * t cluster includes outlier
+        c = 32.0300000000022 # [0 0 1 1 1 2 2] * m cluster includes outlier
+        b = ((a+b)/2) # [ 0  0  1  1 -1  2  2] * the midpoint seems like a good starting point
+        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
+        dbscan = DBSCAN(eps=c, min_samples=min_samples)
+        model = dbscan.fit(X)
+        print(model.labels_)
+
+class labeller:
+    pass
 
 
 if __name__ == '__main__':
 
-    t_labels = ['a', 'a', 'p', 'p', 'o', 't', 't']
-    true_cluster_indices = [2, 3]
-    X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
-
-    clusterer().get_params(X, true_cluster_indices)
+    C = clusterer()
+    # min_eps, max_eps = C.get_cluster_boundaries()
+    # eps = (min_eps+max_eps)/2
+    C.get_labelled_data()
 
     # dbscan = DBSCAN(eps = 10, min_samples = 2)
     # model = dbscan.fit(X)
