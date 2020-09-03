@@ -14,7 +14,7 @@ class DataObj:
     def get_all_keys(self):
         return [i[0] for i in self.db.q(""" SELECT key from csskey """)]
 
-    def create_pd_from_page(self, page_id):
+    def get_dataframe(self, page_id):
 
         # different blocks have different number of computed key/val pairs
         # can't assign column names from row values dynamically using SQL
@@ -38,7 +38,8 @@ class DataObj:
         data = self.db.q(q)
 
         # iterate once over data, storing it by block_id
-        # d holds page level data - repeated for each block, so fine if over-written
+        # d holds page level data - repeated for each block, so fine if over-written,
+        # just collapses into a single row + rest needs to be iterated over anyway
         # temp holds computed keys and vals
 
         d = {}
@@ -94,7 +95,7 @@ class DataObj:
     def get_dataframes(self, page_ids):
         dfs = []
         for page_id in page_ids:
-            dfs.append(self.create_pd_from_page(page_id))
+            dfs.append(self.get_dataframe(page_id))
 
         self.df = pd.concat(dfs)
 
@@ -220,7 +221,6 @@ class DataObj:
         ndf['v'] = (self.df['width']/self.df['page_width'])*(self.df['height']/self.df['page_height'])
 
         self.ppdf = ndf
-
 
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
             #     result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))

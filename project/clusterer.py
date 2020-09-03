@@ -1,4 +1,7 @@
 from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import normalize
+from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -6,7 +9,7 @@ class clusterer:
     # def __init__(self, df):
     #     self.npa = df.to_numpy()
 
-    def get_cluster_boundaries(self):#, X, true_cluster_indices):
+    def get_cluster_boundaries(self, X, true_cluster_indices, min_samples):
         """ Determine the min and max eps to use, using partially labelled data
             Reasoning:
             A single product title will be present on each `Page` dataframe. If you
@@ -18,16 +21,11 @@ class clusterer:
             other than a "Title" datapoint)
         """
 
-        # t_labels = ['a', 'a', 'p', 'p', 'o', 't', 't']
-        true_cluster_indices = [2, 3]
-        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
-
         eps = 0.01
         steps = 0.01
 
         min_eps = 0
         max_eps = 0
-        min_samples = len(true_cluster_indices)
         tci_labels = []
         labels = []
 
@@ -57,31 +55,41 @@ class clusterer:
 
         return min_eps, max_eps
 
-    def get_labelled_data(self):
+    def get_labelled_data(self, eps, min_samples):
         """ Using the pre-caclulated eps, get labelled clusters from the data """
-        min_samples = 2
-        a = 7.089999999999893 # [ 0  0  1  1 -1 -1 -1] * t cluster includes outlier
-        c = 32.0300000000022 # [0 0 1 1 1 2 2] * m cluster includes outlier
-        b = ((a+b)/2) # [ 0  0  1  1 -1  2  2] * the midpoint seems like a good starting point
-        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
-        dbscan = DBSCAN(eps=c, min_samples=min_samples)
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
         model = dbscan.fit(X)
-        print(model.labels_)
 
-class labeller:
-    pass
+        return model.labels_
+
+    def map_labels_by_cluster(self, t_labels, labels):
+        d = {}
+        for i, label in enumerate(labels):
+            if d.get(label):
+                d[label].append(t_labels[i])
+            else:
+                d[label] = [t_labels[i]]
+        return d
 
 
 if __name__ == '__main__':
 
+    X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
+    t_labels = ['a', 'a', 'p', 'p', 'o', 't', 't']
+
+    true_cluster_indices = [2, 3]
+    min_samples = len(true_cluster_indices)
+
     C = clusterer()
-    # min_eps, max_eps = C.get_cluster_boundaries()
-    # eps = (min_eps+max_eps)/2
-    C.get_labelled_data()
+    min_eps, max_eps = C.get_cluster_boundaries(X, true_cluster_indices, min_samples)
+    eps = (min_eps+max_eps)/2 # {0: ['a', 'a'], 1: ['p', 'p'], -1: ['o'], 2: ['t', 't']}
+    labels = C.get_labelled_data(eps, min_samples)
+    print(C.map_labels_by_cluster(t_labels, labels))
+
 
     # dbscan = DBSCAN(eps = 10, min_samples = 2)
     # model = dbscan.fit(X)
     # labels = model.labels_
-    # plt.figure()
-    # plt.scatter(X[:,0], X[:,1])
-    # plt.show()
+    plt.figure()
+    plt.scatter(X[:,0], X[:,1])
+    plt.show()
