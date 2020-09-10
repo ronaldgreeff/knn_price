@@ -19,6 +19,9 @@ class clusterer:
             for each value "Title" datapoint to be within a single cluster)
             and the max_eps (the val a step before the cluster includes something
             other than a "Title" datapoint)
+
+            todo: this could be made more accurate by using more labels, e.g. price
+            or sale_price. Resolve for min and max eps from all clusters.
         """
 
         eps = 0.01

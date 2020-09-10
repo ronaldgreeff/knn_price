@@ -47,7 +47,7 @@ class Computed(BaseModel):
     val = CharField(null=True)
 
 
-# TODO: move ---
+# TODO: move out of models ---
 class DBReader():
     """ Manages reading from database """
 

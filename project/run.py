@@ -9,14 +9,15 @@ import helpers
 
 
 def web_data_to_db():
-    # TODO: shouldn't be here, move (and in local_data_to_db())
+    """ Load up file manager, db writer and crawler. Crawl urls. Quit crawler """
+
+    # todo: shouldn't be here, move
+    # Selenium always seems to load, even when not imported??
     from selenium_obj import Driver
 
     local_files = LocalFiles()
     db_write = DBWriter()
     crawler = Driver('inject.js')
-
-    # from web - using this as saving webpage first loses some of the styling
 
     try:
         for url in local_files.init_urls:
@@ -31,6 +32,10 @@ def web_data_to_db():
 
 
 def local_data_to_db():
+    """ *Less preferred method*
+    Load up file manager, db writer and crawler. Crawl folders. Quit crawler
+    """
+    # todo: shouldn't be here, move
     from selenium_obj import Driver
 
     local_files = LocalFiles()
@@ -51,6 +56,7 @@ def local_data_to_db():
 
 
 def db_to_memory():
+    # specify css keys to retrieve from database
     css_keys = ['color', 'font-size', 'font-weight', 'text-transform',
         # 'text-align', 'vertical-align', 'text-shadow', 'font-family',
         ]
@@ -58,16 +64,9 @@ def db_to_memory():
     data.get_dataframes([1,2,3,4,5])
     data.pre_process()
 
-    # def ff(x):
-    #     return x+1
-    # d = data.df.apply({
-    #     'page_height': ff,
-    #     'page_width': ff,
-    #     })
-    # print(d)
-
 
 if __name__ == '__main__':
 
     # web_data_to_db()
+
     db_to_memory()

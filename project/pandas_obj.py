@@ -68,7 +68,7 @@ class DataObj:
             temp[block_id][row[12]] = row[13]
 
         # iterate over temp index AND css_keys, adding
-        # val if val else page_default into each d[index][css_key]
+        # each d[index][css_key] = val if val else page_default
 
         self.page_defaults = json.loads(page_defaults)
 
@@ -82,15 +82,7 @@ class DataObj:
 
         return df(d).transpose()
 
-        # todo: write tests:
-        # print(temp[35]['display'])
-        # print(self.df.loc[[35]]['display'])
-        # print(len(d))
-        # print([len(temp[i]) for i in temp.keys()])
-        # print(temp.keys())
-        # print(d.keys())
-        # print(d[1].keys())
-        # print(df(d).transpose())
+
 
     def get_dataframes(self, page_ids):
         dfs = []
@@ -120,13 +112,12 @@ class DataObj:
 
     def pre_process(self):
 
-        def str_px_to_int(string_px):
-            """ remove 'px' from string pixel value and return integer """
-            # if type(string_px) == type(int()):
-            #     return string_px
-            # elif type(string_px) == type(str()):
+        def str_px_to_float(string_px):
+            """ remove 'px' from string pixel value and return float """
             if string_px[-2:] == 'px':
                 return float(string_px[:-2])
+            # if type(string_px) == type(int()):
+            return float(string_px)
 
         def rgb_to_coords(rgb_string):
             """ Convert rgb string to (decimal) coords """
@@ -136,39 +127,28 @@ class DataObj:
             return [(int(i)/255) for i in numbers_as_l]
 
         def rgb_to_1d(rgb_string, sat_thr=0.2, val_thr_b=0.1, val_thr_u=1):
-            """ Determine if rgb value is colourful or not
-            first convert rgb to hsv, then if sat below sat thresh (dull)
-            or val beyond either extreme of val (really white or really black),
-            considered no colour and assigned 0, else assigned 1.
+            """ Determine if rgb value is "colourful" or not
+            convert rgb to hsv model (better suited for task/less complex):
 
-            hue: ignored (doesn't matter what the colour)
-            sat: dull (low) to intense (high) colour
-            val: black (low) to white (high) lightness
+                hue: ignored (actual colour doesn't matter)
+                sat: dull (low) to intense (high) colour
+                val: black (low) to white (high) lightness
+
+            So if sat too dull or val too dark or bright, it's 0, else 1
             """
 
-            rgb_coords = rgb_to_coords(rgb_string)
+            r, g, b = rgb_to_coords(rgb_string)
+            hue, sat, val = colorsys.rgb_to_hsv(r, g, b)
+            eval = (sat < sat_thr or val_thr_b > val or val > val_thr_u)
 
-            hsv = colorsys.rgb_to_hsv(
-                r=rgb_coords[0],
-                g=rgb_coords[1],
-                b=rgb_coords[2],
-                )
-
-            hue = hsv[0]
-            sat = hsv[1]
-            val = hsv[2]
-
-            if sat < sat_thr or val_thr_b > val or val > val_thr_u:
-                result = 0
-            else:
-                result = 1
+            result = 0 if eval else 1
 
             return result
 
         def text_to_features(texts):
             """
-            Params: a list of text
-            Output: len, digits, symbols, chars, spaces
+            Params: a list of strings (texts)
+            Output: len, digits, symbols, chars, spaces for joined texts
             """
             len = 0
             chars = 0
@@ -206,13 +186,13 @@ class DataObj:
 
         # process #
 
-        dflt_font_size = str_px_to_int(self.page_defaults['font-size'])
+        dflt_font_size = str_px_to_float(self.page_defaults['font-size'])
         dflt_font_weight = int(self.page_defaults['font-weight'])
 
         ndf = self.df['text'].apply(text_to_features)
         ndf['label'] = self.df['label']
         ndf['color'] = self.df['color'].apply(rgb_to_1d)
-        ndf['font-size'] = self.df['font-size'].apply(str_px_to_int) / dflt_font_size
+        ndf['font-size'] = self.df['font-size'].apply(str_px_to_float) / dflt_font_size
         ndf['font-weight'] = self.df['font-weight'].astype(int) / dflt_font_weight
         ndf['text-transform'] = self.df['text-transform'].apply(text_transform)
 
@@ -222,6 +202,17 @@ class DataObj:
 
         self.ppdf = ndf
 
+        # todo: write get_dataframe tests:
+        # print(temp[35]['display'])
+        # print(self.df.loc[[35]]['display'])
+        # print(len(d))
+        # print([len(temp[i]) for i in temp.keys()])
+        # print(temp.keys())
+        # print(d.keys())
+        # print(d[1].keys())
+        # print(df(d).transpose())
+
+        # todo: write tests for rgb_to_1d
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
             #     result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
         # for i in (
