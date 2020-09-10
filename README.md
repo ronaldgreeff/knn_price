@@ -17,4 +17,5 @@ Following that: include further domains to build an even better model, and have 
 
 # Great sources of info:
 "Web Content Extraction Through Machine Learning", Ziyan Zhou & Muntasir Mashuq
+
 "Sociopath: Automatic Local Events Extractor", Galina Alperovich
