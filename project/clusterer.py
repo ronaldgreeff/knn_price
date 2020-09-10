@@ -77,6 +77,8 @@ class clusterer:
 
 if __name__ == '__main__':
 
+    # todo: move this into test
+
     X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80],[95, 105], [105, 95] ])
     t_labels = ['a', 'a', 'p', 'p', 'o', 't', 't']
 
