@@ -23,7 +23,8 @@ class TestClusterControl(unittest.TestCase):
         """
         tci = self.tci_list[0]
         min_samples = len(tci)
-        self.CC._new_dbscan_obj(min_samples)
+
+        # self.CC._new_dbscan_obj(min_samples)
         # min_samples = len(true_cluster_indices)
         min_eps, max_eps = self.CC.get_min_eps_for_cluster(tci)
 
