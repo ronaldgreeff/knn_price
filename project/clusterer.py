@@ -19,7 +19,6 @@ class DbscanObj:
         self.obj.eps = eps
 
 
-
 class ClusterControl:
 
     def __init__(self, X, tcis, step=0.00001):
@@ -44,7 +43,7 @@ class ClusterControl:
         keep increasing eps by step until
         a non tci datapoint is included minus 1 step - max
         """
-        eps = 0
+        eps = self.step
 
         dbscan = self._new_dbscan_obj(eps=eps, min_samples=min_samples)
         dbscan._new_dbscan_model(self.X)
@@ -54,10 +53,11 @@ class ClusterControl:
         # keep going until cluster labels all == 1
         while len(set(cluster_labels)) != 1:
             dbscan.eps = eps
-            labels = model.labels_
+            labels = dbscan.obj.labels_
             #                                        ignore outliers
             cluster_labels = [labels[i] for i in tci if labels[i] >=0]
             eps += self.step
+            print(eps)
 
         min_eps = eps
 
@@ -73,7 +73,7 @@ class ClusterControl:
         return min_eps, max_eps
 
 
-    def get_cluster_boundaries(self, true_cluster_indices, min_samples, eps=0.01, steps=0.01):
+    def get_cluster_boundaries(self):
 
         self.all_eps = []
 
