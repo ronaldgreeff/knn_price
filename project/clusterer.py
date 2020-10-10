@@ -50,14 +50,16 @@ class ClusterControl:
 
         # labels = []
         cluster_labels = []
+        lc = len(set(cluster_labels))
         # keep going until cluster labels all == 1
-        while len(set(cluster_labels)) != 1:
+        while lc != 1:
             dbscan.eps = eps
             labels = dbscan.obj.labels_
-            #                                        ignore outliers
+            #                                        ignore outliers, -1
             cluster_labels = [labels[i] for i in tci if labels[i] >=0]
             eps += self.step
-            print(eps)
+            print("{} {} {}".format( cluster_labels, labels, eps ))
+            break
 
         min_eps = eps
 
