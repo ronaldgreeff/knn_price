@@ -5,108 +5,69 @@ from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 
+def get_min_eps_for_cluster(X, tci, min_samples, step):
+
+    tci_labels = set()
+    eps = step
+
+    while True:
+        clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
+        tci_labels = set([clustering.labels_[i] for i in tci if clustering.labels_[i] >=0])
+
+        if len(tci_labels) == 1:
+            return round(eps, 5)
+
+        eps += step
 
 
-class DbscanObj:
+def get_max_eps_for_cluster(X, tci, min_samples, step, label, eps):
 
-    def __init__(self, eps=0, min_samples=1):
-        self.obj = DBSCAN(eps, min_samples)
+    while True:
+        clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
+        label_occurences = list(clustering.labels_).count(label)
 
-    def _new_dbscan_model(self, X):
-        self.obj.fit(X)
+        print(eps, clustering.labels_, label_occurences)
 
-    def set_eps(self, eps):
-        self.obj.eps = eps
+        if label_occurences > min_samples:
+            return round((eps - step), 5)
 
+        eps += step
 
-class ClusterControl:
+def get_cluster_boundaries(self):
+    pass
 
-    def __init__(self, X, tcis, step=0.00001):
-
-        self.X = X
-        self.tcis = tcis
-        self.step = step
-        self.min_eps = 0
-        self.max_eps = 0
-        self.dbscan_obj = self._new_dbscan_obj()
-
-
-    def _new_dbscan_obj(self, eps=0, min_samples=1):
-        return DbscanObj(eps, min_samples)
-
-
-    def get_min_max_eps_for_cluster(self, tci, min_samples):
-        """ new dbscan instance with eps 0
-        tci (truth cluster indices) - indices of X data that form a known cluster
-        increase eps by step
-        all tci datapoints in a single cluster - min
-        keep increasing eps by step until
-        a non tci datapoint is included minus 1 step - max
-        """
-        eps = self.step
-
-        dbscan = self._new_dbscan_obj(eps=eps, min_samples=min_samples)
-        dbscan._new_dbscan_model(self.X)
-
-        # labels = []
-        cluster_labels = []
-        lc = len(set(cluster_labels))
-        # keep going until cluster labels all == 1
-        while lc != 1:
-            dbscan.eps = eps
-            labels = dbscan.obj.labels_
-            #                                        ignore outliers, -1
-            cluster_labels = [labels[i] for i in tci if labels[i] >=0]
-            eps += self.step
-            print("{} {} {}".format( cluster_labels, labels, eps ))
-            break
-
-        min_eps = eps
-
-        label = set(tci_labels).pop()
-
-        while list(labels).count(label) <= min_samples:
-            dbscan.eps = eps
-            labels = model.labels_
-            eps += self.step
-
-        max_eps = eps
-
-        return min_eps, max_eps
-
-
-    def get_cluster_boundaries(self):
-
-        self.all_eps = []
-
-        for tci in self.tcis:
-
-            min_samples = len(tci)
-
-            min_eps, max_eps = self.get_min_max_eps_for_cluster(tci, min_samples)
-
-            self.min = min_eps if (min_eps < self.min and self.min != 0) else 0
-            self.max = max_eps if (max_eps < self.max and self.max != 0) else 0
-
-            self.all_eps.append((min_eps, max_eps))
-
-
-    def get_labelled_data(self, eps, min_samples):
-        """ Using the pre-caclulated eps, get labelled clusters from the data
-        """
-        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
-        model = dbscan.fit(X)
-
-        return model.labels_
-
-    def map_labels_by_cluster(self, t_labels, labels):
-        d = {}
-        for i, label in enumerate(labels):
-            if d.get(label):
-                d[label].append(t_labels[i])
-            else:
-                d[label] = [t_labels[i]]
-        return d
+    # def get_cluster_boundaries(self):
+    #
+    #     self.all_eps = []
+    #
+    #     for tci in self.tcis:
+    #
+    #         min_samples = len(tci)
+    #
+    #         min_eps, max_eps = self.get_min_max_eps_for_cluster(self.X, tci, min_samples)
+    #
+    #         self.min = min_eps if (min_eps < self.min and self.min != 0) else 0
+    #         self.max = max_eps if (max_eps < self.max and self.max != 0) else 0
+    #
+    #         self.all_eps.append((min_eps, max_eps))
+    #
+    #
+    # def get_labelled_data(self, eps, min_samples):
+    #     """ Using the pre-caclulated eps, get labelled clusters from the data
+    #     """
+    #     dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+    #     model = dbscan.fit(X)
+    #
+    #     return model.labels_
+    #
+    # def map_labels_by_cluster(self, t_labels, labels):
+    #     d = {}
+    #     for i, label in enumerate(labels):
+    #         if d.get(label):
+    #             d[label].append(t_labels[i])
+    #         else:
+    #             d[label] = [t_labels[i]]
+    #     return d
 
 
 if __name__ == '__main__':
