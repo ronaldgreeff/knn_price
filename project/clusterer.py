@@ -26,15 +26,15 @@ def get_max_eps_for_cluster(X, tci, min_samples, step, label, eps):
         clustering = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
         label_occurences = list(clustering.labels_).count(label)
 
-        print(eps, clustering.labels_, label_occurences)
+        # print(eps, clustering.labels_, label_occurences)
 
         if label_occurences > min_samples:
             return round((eps - step), 5)
 
         eps += step
 
-def get_cluster_boundaries(self):
-    pass
+def get_cluster_boundaries(self, tcis):
+    return
 
     # def get_cluster_boundaries(self):
     #
