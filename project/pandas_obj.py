@@ -3,7 +3,6 @@ import numpy as np
 from pandas import DataFrame as df
 from models import DBReader
 import json
-import colorsys
 
 class DataObj:
 
@@ -157,7 +156,7 @@ class DataObj:
 
         ndf = self.df['text'].apply(text_to_features)
         ndf['label'] = self.df['label']
-        ndf['color'] = self.df['color'].apply(rgb_to_1d)
+        ndf['color'] = self.df['color'].apply(is_it_color)
         ndf['font-size'] = self.df['font-size'].apply(str_px_to_float) / dflt_font_size
         ndf['font-weight'] = self.df['font-weight'].astype(int) / dflt_font_weight
         ndf['text-transform'] = self.df['text-transform'].apply(text_transform)

@@ -3,44 +3,65 @@ import numpy as np
 from utils import *
 from clusterer import *
 
+
 class TestUtils(unittest.TestCase):
+
     def test_str_px_to_float(self):
 
-        result = str_px_to_float("50px")
+        poss_vals = ["50px", 50, 50.0]
 
-        self.assertEqual(type(result), type(float()))
-        self.assertEqual(result, 50.0)
+        for pval in poss_vals:
+            result = str_px_to_float(pval)
+
+            self.assertEqual(type(result), type(float()))
+            self.assertEqual(result, 50.0)
+
 
     def test_rgb_to_coords(self):
-        pass
-    def test_rgb_to_1d(self):
-        pass
 
-        # todo: write tests for rgb_to_1d
+        rgb_string = 'rgb(80, 125, 255)'
+        r, g, b = rgb_to_coords(rgb_string)
+        self.assertEqual([r, g, b], [(80/255), (125/255), (255/255)])
+
+
+    def test_is_it_color(self):
+
+        colours = (
+            ('rgb(0, 0, 0)', 0, 'black',),
+            ('rgb(255, 255, 255)', 0, 'white',),
+            ('rgb(255, 0, 0)', 1, 'red',),
+            ('rgb(0, 255, 0)', 1, 'green',),
+            ('rgb(0, 0, 255)', 1, 'blue',),
+            ('rgb(255, 128, 128)', 1, 'pink (center top)',),
+            ('rgb(25, 13, 13)', 0, 'basically black (center bottom)',),
+            ('rgb(128, 115, 115)', 0, 'basically grey (center left)',),
+            ('rgb(128, 0, 0)', 1, 'red (mid right)',),
+            ('rgb(128, 128, 128)', 0, 'grey (mid left)',),
+            ('rgb(128, 64, 64)', 1, '(dead centre)',),
+            ('rgb(255, 186, 186)', 1, 'pink left',),
+            ('rgb(255, 15, 15)', 1, 'pink right',),
+            ('rgb(0, 106, 184)', 1, '$data blue',),
+            ('rgb(242, 242, 242)', 0, '$data (white)',),
+            ('rgb(89, 88, 89)', 0, '$data darkish grey',),
+            ('rgb(102, 102, 102)', 0, '$data lightish grey',),
+            ('rgb(194, 194, 194)', 0, '$data light grey',),
+            ('rgb(51, 51, 51)', 0, '$data dark grey',),
+            ('rgb(255, 207, 207)', 0, '$edge pink far left',),
+            ('rgb(77, 38, 38)', 1, '$edge dark red',),
+        )
+
+        for rgb, expectation, colour in colours:
+
+            result = is_it_color(rgb)
+            if expectation != result:
+                print(colour, expectation, result)
+
+            self.assertEqual(result, expectation)
+
+        # todo: write tests for is_it_color
             # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
             #     result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
         # for i in (
-        #     ('rgb(0, 0, 0)', 'black',),
-        #     ('rgb(255, 255, 255)', 'white',),
-        #     ('rgb(128, 64, 64)', '(dead centre)',),
-        #     ('rgb(255, 0, 0)', 'red',),
-        #     ('rgb(0, 255, 0)', 'green',),
-        #     ('rgb(0, 0, 255)', 'blue',),
-        #     ('rgb(128, 0, 0)', 'red (mid right)',),
-        #     ('rgb(77, 38, 38)', 'dark red',),
-        #     ('rgb(0, 106, 184)', 'data blue',),
-        #     ('rgb(255, 128, 128)', 'pink (center top)',),
-        #     ('rgb(255, 207, 207)', 'pink far left',),
-        #     ('rgb(255, 186, 186)', 'pink left',),
-        #     ('rgb(255, 15, 15)', 'pink right',),
-        #     ('rgb(128, 128, 128)', 'grey (mid left)',),
-        #     ('rgb(25, 13, 13)', 'basically black (center bottom)',),
-        #     ('rgb(128, 115, 115)', 'basically grey (center left)',),
-        #     ('rgb(242, 242, 242)', 'data (white)',),
-        #     ('rgb(89, 88, 89)', 'data darkish grey',),
-        #     ('rgb(102, 102, 102)', 'data lightish grey',),
-        #     ('rgb(194, 194, 194)', 'data light grey',),
-        #     ('rgb(51, 51, 51)', 'data dark grey',),
         # )
 
 
