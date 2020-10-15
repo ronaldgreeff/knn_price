@@ -7,30 +7,28 @@ def str_px_to_float(string_px):
             string_px = string_px[:-2]
     return float(string_px)
 
-def is_it_color(rgb_string, sat_thr=0.2, val_thr_b=0.1, val_thr_u=1):
+def is_it_color(rgb_string, sat_thr=0.19, val_thr_b=0.11, val_thr_u=1.0):
     """ Determine if rgb value is "colourful" or not.
     Convert rgb to hsv model to make less complex:
         hue: ignored (actual colour doesn't matter)
-        sat: dull (low) to intense (high) colour
         val: black (low) to white (high) lightness
-    If val falls between val bottom and upper thresholds, its
-    considered "potentially colourful" (since not too light or dark).
-    If it's sat/colour intensity above given threshold, it's considered coloured
+        sat: dull (low) to intense (high) colour
+    val can't be too light or too dark / must be within extremes
+    sat must be higher than threshold to be considered coloured
     Return 0 or 1 so that we get large separation between datapoints if coloured
     """
-
     r, g, b = rgb_to_coords(rgb_string)
     hue, sat, val = colorsys.rgb_to_hsv(r, g, b)
 
-    val = (val_thr_b < val < val_thr_u)
-    sat = (val > sat_thr)
-    eval = 1 if all((val, sat,)) else 0
+    eval_extremes = (val_thr_b < val <= val_thr_u)
+    eval_intensity = (sat_thr < sat)
 
-    print(val, sat, eval)
+    eval = 1 if all((eval_extremes, eval_intensity,)) else 0
 
-    #       sat too dull or val below bottom or val above upper
-    # eval = (sat < sat_thr or val_thr_b > val or val > val_thr_u)
-    # result = 0 if eval else 1
+    # print(
+    # 'sat: {} sat_thr: {} *{}| val: {} val-b: {} val-u: {} *{} | *{}*\n'.format(
+    # sat, sat_thr, eval_intensity, val, val_thr_b, val_thr_u, eval_extremes, eval)
+    # )
 
     return eval
 

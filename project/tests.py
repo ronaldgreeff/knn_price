@@ -27,9 +27,9 @@ class TestUtils(unittest.TestCase):
     def test_is_it_color(self):
 
         colours = (
+            ('rgb(255, 0, 0)', 1, 'red',),
             ('rgb(0, 0, 0)', 0, 'black',),
             ('rgb(255, 255, 255)', 0, 'white',),
-            ('rgb(255, 0, 0)', 1, 'red',),
             ('rgb(0, 255, 0)', 1, 'green',),
             ('rgb(0, 0, 255)', 1, 'blue',),
             ('rgb(255, 128, 128)', 1, 'pink (center top)',),
@@ -46,26 +46,24 @@ class TestUtils(unittest.TestCase):
             ('rgb(102, 102, 102)', 0, '$data lightish grey',),
             ('rgb(194, 194, 194)', 0, '$data light grey',),
             ('rgb(51, 51, 51)', 0, '$data dark grey',),
-            ('rgb(255, 207, 207)', 0, '$edge pink far left',),
             ('rgb(77, 38, 38)', 1, '$edge dark red',),
+            ('rgb(31, 15, 15)', 1, '$edge darker red/brown',),
+            ('rgb(26, 1, 1)', 0, '$edge super dark brown/black',),
+            ('rgb(255, 207, 207)', 0, '$edge pink far left',),
+            ('rgb(235, 216, 216)', 0, '$edge super light pink/white',),
+            ('rgb(230, 200, 200)', 0, '$edge super light pink/white',),
         )
 
         for rgb, expectation, colour in colours:
-
             result = is_it_color(rgb)
+
             if expectation != result:
-                print(colour, expectation, result)
+                print('FAILED: {} exp: {} res: {}'.format(
+                    colour, expectation, result))
 
             self.assertEqual(result, expectation)
 
-        # todo: write tests for is_it_color
-            # print('{} {}: sat: {:.2f} {} | b: {:.2f}, val: {:.2f}, u: {:.2f} {}'.format(
-            #     result, text, sat, (sat<sat_thr), val_thr_b, val, val_thr_u, (val_thr_b > val > val_thr_u)))
-        # for i in (
-        # )
-
-
-# class TestPandasObj(unittest.TestCase)
+# class TestDataObj(unittest.TestCase):
         # todo: write get_dataframe tests:
         # print(temp[35]['display'])
         # print(self.df.loc[[35]]['display'])
@@ -106,6 +104,8 @@ class TestClusterControl(unittest.TestCase):
         tcis = ([0, 1], [2, 3], [5, 6, 7]) # list of X indices that should form true clusters
 
         result = get_cluster_boundaries(X, tcis)
+
+        pass #todo
 
 
 if __name__ == '__main__':

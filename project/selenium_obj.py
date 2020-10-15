@@ -28,11 +28,13 @@ class Driver(Driver_Config):
         self.driver = Driver_Config.driver
         self.script = open(script).read()
 
+
     def quit(self, m=None):
         """ Quit the driver. Print a message if provided """
         if m:
             print( '{}'.format(m) )
         self.driver.quit()
+
 
     def get_page(self, page, sleep=10):
         """ Navigate to URL or local file (page), inject script, return
@@ -46,9 +48,11 @@ class Driver(Driver_Config):
         extract = self.driver.execute_script(self.script)
         return extract
 
+
     def save_screenshot(self, location):
         """ Save a screenshot - requires the full path name """
         self.driver.save_screenshot(location)
+
 
     def process_file(self, dir, filename, screenshot=None):
         """ Extract from local file """
