@@ -55,18 +55,6 @@ def local_data_to_db():
         crawler.quit()
 
 
-def db_to_memory():
-    # specify css keys to retrieve from database
-    css_keys = ['color', 'font-size', 'font-weight', 'text-transform',
-        # 'text-align', 'vertical-align', 'text-shadow', 'font-family',
-        ]
-    data = DataObj(css_keys=css_keys)
-    data.get_dataframes([1,2,3,4,5])
-    data.pre_process()
-
-
 if __name__ == '__main__':
 
     # web_data_to_db()
-
-    db_to_memory()

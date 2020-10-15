@@ -50,7 +50,6 @@ class Computed(BaseModel):
 # TODO: move out of models ---
 class DBReader():
     """ Manages reading from database """
-
     def con(self):
         return database
         # return query.sql()[0], database

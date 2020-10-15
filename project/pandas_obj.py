@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 from pandas import DataFrame as df
-from models import DBReader
 import json
+from models import DBReader
+from utils import (str_px_to_float, is_it_color, rgb_to_coords,
+    text_to_features, )
 
 class DataObj:
 
@@ -82,7 +84,6 @@ class DataObj:
         return df(d).transpose()
 
 
-
     def get_dataframes(self, page_ids):
         dfs = []
         for page_id in page_ids:
@@ -111,56 +112,28 @@ class DataObj:
 
     def pre_process(self):
 
-        def text_to_features(texts):
-            """
-            Params: a list of strings (texts)
-            Output: len, digits, symbols, chars, spaces for joined texts
-            """
-            len = 0
-            chars = 0
-            digits = 0
-            spaces = 0
-            denom = 0
-
-            texts = json.loads(texts)
-            text = ''.join(texts)
-
-            for t in text:
-                if t.isalpha():
-                    chars += 1
-                elif t.isdigit():
-                    digits += 1
-                elif t.isspace():
-                    spaces += 1
-                else:
-                    if t in ('£', '$'):
-                        denom += 1
-                len += 1
-
+        def text_features_to_pd_series(texts):
+            text, len, digits, chars, spaces, denom = text_to_features(texts)
             return pd.Series({
                 'str': text,
                 'len': len,
                 'chars': (chars/len),
                 'digits': (digits/len),
                 'spaces': (spaces/len),
-                'denom': denom,
-                })
+                'denom': denom, })
 
         def text_transform(ttv):
             return 1 if ttv == 'capitalize' or ttv == 'uppercase' else 0
 
-        # process #
-
         dflt_font_size = str_px_to_float(self.page_defaults['font-size'])
         dflt_font_weight = int(self.page_defaults['font-weight'])
 
-        ndf = self.df['text'].apply(text_to_features)
+        ndf = self.df['text'].apply(text_features_to_pd_series)
         ndf['label'] = self.df['label']
         ndf['color'] = self.df['color'].apply(is_it_color)
         ndf['font-size'] = self.df['font-size'].apply(str_px_to_float) / dflt_font_size
         ndf['font-weight'] = self.df['font-weight'].astype(int) / dflt_font_weight
         ndf['text-transform'] = self.df['text-transform'].apply(text_transform)
-
         ndf['x'] = (self.df['top'] + (self.df['height']/2) ) / self.df['page_height']
         ndf['y'] = (self.df['left'] + (self.df['width']/2) ) / self.df['page_width']
         ndf['v'] = (self.df['width']/self.df['page_width'])*(self.df['height']/self.df['page_height'])

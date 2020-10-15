@@ -2,6 +2,63 @@ import unittest
 import numpy as np
 from utils import *
 from clusterer import *
+from pandas_obj import *
+
+class TestDataObj(unittest.TestCase):
+    css_keys = ['color', 'font-size', 'font-weight', 'text-transform',
+        # 'text-align', 'vertical-align', 'text-shadow', 'font-family',
+        ]
+    data = DataObj(css_keys=css_keys)
+    data.get_dataframes([1,2,3,4,5])
+    data.pre_process()
+    print(data.ppdf)
+    print(data.ppdf.head())
+    print(data.ppdf.columns)
+
+# class TestDataObjFunctions(unittest.TestCase):
+        # todo: write get_dataframe tests:
+        # print(temp[35]['display'])
+        # print(self.df.loc[[35]]['display'])
+        # print(len(d))
+        # print([len(temp[i]) for i in temp.keys()])
+        # print(temp.keys())
+        # print(d.keys())
+        # print(d[1].keys())
+        # print(df(d).transpose())
+
+
+class TestClusterControl(unittest.TestCase):
+
+    def test_get_min_eps_for_cluster(self):
+        X = np.array([[1, 2], [2, 2], [2, 3]])
+        tci = [0, 1, 2]
+        min_samples = len(tci) # since we expect tcis to represent a unique element per page/sample
+        step = 0.01
+
+        result = get_min_eps_for_cluster(X, tci, min_samples, step)
+
+        self.assertEqual(result, 1.0)
+
+
+    def test_get_max_eps_for_cluster(self):
+        X = np.array([[1, 0], [1, 0], [5, 0]])
+        tci = [0, 1]
+        min_samples = len(tci)
+        step = 0.01
+
+        result = get_max_eps_for_cluster(X, tci, min_samples, step, label=0, eps=1.0,)
+
+        self.assertEqual(result, 4.0)
+
+
+    def test_get_cluster_boundaries(self):
+
+        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80], [95, 105], [105, 95], [100, 100] ])
+        tcis = ([0, 1], [2, 3], [5, 6, 7]) # list of X indices that should form true clusters
+
+        result = get_cluster_boundaries(X, tcis)
+
+        pass #todo
 
 
 class TestUtils(unittest.TestCase):
@@ -63,50 +120,23 @@ class TestUtils(unittest.TestCase):
 
             self.assertEqual(result, expectation)
 
-# class TestDataObj(unittest.TestCase):
-        # todo: write get_dataframe tests:
-        # print(temp[35]['display'])
-        # print(self.df.loc[[35]]['display'])
-        # print(len(d))
-        # print([len(temp[i]) for i in temp.keys()])
-        # print(temp.keys())
-        # print(d.keys())
-        # print(d[1].keys())
-        # print(df(d).transpose())
+    def test_text_to_features(self):
 
-class TestClusterControl(unittest.TestCase):
+        test_texts = (
+            (["Home"], ('Home', 4, 0, 4, 0, 0)),
+            (["this is a ", "mega", " sale!"], ('this is a mega sale!', 20, 0, 15, 4, 0)),
+            (["why is this paragraph so fricken' long?"], ('why is this paragraph so fricken\' long?', 39, 0, 31, 6, 0)),
+            (["£35.00"], ('£35.00', 6, 4, 0, 0, 1)),
+            (["£", "35.00"], ('£35.00', 6, 4, 0, 0, 1)),
+        )
 
-    def test_get_min_eps_for_cluster(self):
-        X = np.array([[1, 2], [2, 2], [2, 3]])
-        tci = [0, 1, 2]
-        min_samples = len(tci) # since we expect tcis to represent a unique element per page/sample
-        step = 0.01
+        for texts, expected in test_texts:
+            result = text_to_features(json.dumps(texts))
 
-        result = get_min_eps_for_cluster(X, tci, min_samples, step)
+            self.assertEqual(result, expected)
 
-        self.assertEqual(result, 1.0)
-
-
-    def test_get_max_eps_for_cluster(self):
-        X = np.array([[1, 0], [1, 0], [5, 0]])
-        tci = [0, 1]
-        min_samples = len(tci)
-        step = 0.01
-
-        result = get_max_eps_for_cluster(X, tci, min_samples, step, label=0, eps=1.0,)
-
-        self.assertEqual(result, 4.0)
-
-
-    def test_get_cluster_boundaries(self):
-
-        X = np.array([ [10, 5], [5, 10], [50, 55], [55, 50], [70, 80], [95, 105], [105, 95], [100, 100] ])
-        tcis = ([0, 1], [2, 3], [5, 6, 7]) # list of X indices that should form true clusters
-
-        result = get_cluster_boundaries(X, tcis)
-
-        pass #todo
-
+    def text_transform(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
