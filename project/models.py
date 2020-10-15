@@ -46,7 +46,6 @@ class Computed(BaseModel):
     key = ForeignKeyField(CSSKey)
     val = CharField(null=True)
 
-
 # TODO: move out of models ---
 class DBReader():
     """ Manages reading from database """
@@ -54,10 +53,40 @@ class DBReader():
         return database
         # return query.sql()[0], database
 
-    def q(self, query):
-        """ executes sql query, fetches all """
-        cursor = database.execute_sql(query)
+    def query_page(self, page_id):
+        """ executes sql query, fetches all data for page_id.
+        Different blocks have different number of computed key/val pairs
+        can't assign column names from row values dynamically using SQL
+        so can't pivot. Want to perform operations on data anyway, so
+        might as well query everything and perform operations during db -> df
+        """
+
+        q = """
+        SELECT site.netloc, page.url, page.defaults,
+        page.window_innerHeight, page.window_innerWidth,
+        block.id, block.text, block.top, block.left,
+        block.width, block.height, block.label,
+        csskey.key, computed.val
+        FROM site
+        JOIN page ON page.site_id == site.id
+        JOIN block ON block.page_id == page.id
+        JOIN computed ON computed.block_id == block.id
+        JOIN csskey ON csskey.id == computed.key_id
+        WHERE page.id == {id}
+        """.format(id=page_id)
+
+        cursor = database.execute_sql(q)
         return cursor.fetchall()
+
+    def data_to_dict(self, data):
+        pass
+
+    def fetch_page_data(self, page_id):
+
+        data = query_page(page_id)
+        d
+
+
 
 class DBWriter():
     """ Manages writing to db including initial setup of tables """

@@ -17,26 +17,7 @@ class DataObj:
 
     def get_dataframe(self, page_id):
 
-        # different blocks have different number of computed key/val pairs
-        # can't assign column names from row values dynamically using SQL
-        # so can't pivot. Want to perform operations on data anyway, so
-        # might as well query everything and perform operations during db -> df
 
-        q = """
-        SELECT site.netloc, page.url, page.defaults,
-        page.window_innerHeight, page.window_innerWidth,
-        block.id, block.text, block.top, block.left,
-        block.width, block.height, block.label,
-        csskey.key, computed.val
-        FROM site
-        JOIN page ON page.site_id == site.id
-        JOIN block ON block.page_id == page.id
-        JOIN computed ON computed.block_id == block.id
-        JOIN csskey ON csskey.id == computed.key_id
-        WHERE page.id == {id}
-        """.format(id=page_id)
-
-        data = self.db.q(q)
 
         # iterate once over data, storing it by block_id
         # d holds page level data - repeated for each block, so fine if over-written,
