@@ -43,11 +43,11 @@ class DBReader():
 class DBWriter():
     """ Manages writing to db including initial setup of tables """
 
-    def __init__(self, db_to_use):
+    def __init__(self):
         """ build db """
 
-        global database
-        database = db_to_use
+        # global database
+        # database = db_to_use
 
         database.connect()
         with database:

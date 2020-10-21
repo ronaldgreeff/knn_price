@@ -1,15 +1,16 @@
+from database import models
+from database.db_managers import DBReader as dbr
+from crawler import selenium_obj
+from database.db_managers import DBWriter as dbw
+from data import clusterer, dataframe
+from utils import local_files, urls, features
+
 import unittest
 import numpy as np
-from utils import *
-from clusterer import *
-from pandas_obj import *
-
-from models import DBWriter
 from peewee import *
 import json
 
-
-class TestDBReader(unittest.TestCase):
+class TestDBWriter(unittest.TestCase):
 
     database = 'test.db'
     dbw = DBWriter(database)

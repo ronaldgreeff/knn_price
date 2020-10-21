@@ -1,10 +1,12 @@
 from datetime import datetime
 from peewee import *
 
+database = SqliteDatabase(None)
+
 class BaseModel(Model):
 
     class Meta:
-        database = SqliteDatabase(database)
+        database = database
 
 class Site(BaseModel):
     netloc = CharField(null=False, unique=True)
