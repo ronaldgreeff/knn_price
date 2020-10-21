@@ -4,13 +4,11 @@ from peewee import *
 import json
 import helpers
 
-database = SqliteDatabase('database.db')
 
 class BaseModel(Model):
 
     class Meta:
-        database = database
-
+        database = SqliteDatabase(database)
 
 class Site(BaseModel):
     netloc = CharField(null=False, unique=True)
@@ -48,10 +46,8 @@ class Computed(BaseModel):
 
 # TODO: move out of models ---
 class DBReader():
-    """ Manages reading from database """
-    def con(self):
-        return database
-        # return query.sql()[0], database
+    def __init__(self, database=''):
+        self.database = database if database else SqliteDatabase('database.db')
 
     def query_page(self, page_id):
         """ executes sql query, fetches all data for page_id.
@@ -75,7 +71,7 @@ class DBReader():
         WHERE page.id == {id}
         """.format(id=page_id)
 
-        cursor = database.execute_sql(q)
+        cursor = self.database.execute_sql(q)
         return cursor.fetchall()
 
     def data_to_dict(self, data):
@@ -84,20 +80,24 @@ class DBReader():
     def fetch_page_data(self, page_id):
 
         data = query_page(page_id)
-        d
-
+        # todo
 
 
 class DBWriter():
     """ Manages writing to db including initial setup of tables """
 
-    def __init__(self):
+    def __init__(self, db_to_use):
         """ build db """
+
+        global database
+        database = db_to_use
 
         database.connect()
         with database:
             database.create_tables([Site, Page, Block, CSSKey, Computed])
         database.close()
+
+        self.database = database
 
     def store_page_extract(self, url, extract, purge_record=True):
         """ prepare extracted data then import it as part of a transaction
@@ -112,7 +112,7 @@ class DBWriter():
             if helpers.link_in_netloc(netloc, link):
                 valid_links.append(link)
 
-        with database.atomic() as transaction:
+        with self.database.atomic() as transaction:
             # to rollback if exception
             try:
 

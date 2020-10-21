@@ -4,6 +4,27 @@ from utils import *
 from clusterer import *
 from pandas_obj import *
 
+from models import DBWriter
+from peewee import *
+import json
+
+
+class TestDBReader(unittest.TestCase):
+
+    database = 'test.db'
+    dbw = DBWriter(database)
+
+    # extract = 'test_extract.json'
+    # with open(extract, 'r') as f:
+    #     extract = json.loads(f.read())
+
+    # dbw.store_page_extract(
+    #     extract = extract,
+    #     url = 'https://www.boots.com/loreal-paris-revitalift-filler-serum-30ml-10274580',
+    #     purge_record = False,
+    # )
+
+
 class TestDataObj(unittest.TestCase):
     css_keys = ['color', 'font-size', 'font-weight', 'text-transform',
         # 'text-align', 'vertical-align', 'text-shadow', 'font-family',
@@ -11,9 +32,9 @@ class TestDataObj(unittest.TestCase):
     data = DataObj(css_keys=css_keys)
     data.get_dataframes([1,2,3,4,5])
     data.pre_process()
-    print(data.ppdf)
-    print(data.ppdf.head())
-    print(data.ppdf.columns)
+    # print(data.ppdf)
+    # print(data.ppdf.head())
+    # print(data.ppdf.columns)
 
 # class TestDataObjFunctions(unittest.TestCase):
         # todo: write get_dataframe tests:

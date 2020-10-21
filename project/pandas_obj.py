@@ -17,7 +17,7 @@ class DataObj:
 
     def get_dataframe(self, page_id):
 
-
+        data = self.db.query_page(page_id)
 
         # iterate once over data, storing it by block_id
         # d holds page level data - repeated for each block, so fine if over-written,
