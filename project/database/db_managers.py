@@ -1,6 +1,5 @@
 from .models import database, Site, Page, Block, CSSKey, Computed
-
-from utils import urls
+from utils.urls import parse_url, unparse_url, link_in_netloc
 from peewee import *
 import json
 
@@ -23,13 +22,13 @@ class DBWriter():
         """ prepare extracted data then import it as part of a transaction
         which can be rollbacked in case of exception """
 
-        parsed_url = helpers.urlparse(url)
+        parsed_url = parse_url(url)
         netloc = parsed_url[1]
-        clean_url = helpers.unparse_url(parsed_url)
+        clean_url = unparse_url(parsed_url)
 
         valid_links = []
         for link in extract['links']:
-            if helpers.link_in_netloc(netloc, link):
+            if link_in_netloc(netloc, link):
                 valid_links.append(link)
 
         with self.database.atomic() as transaction:
@@ -98,40 +97,40 @@ class DBWriter():
             except:
                 transaction.rollback()
                 raise
-#
-# class DBReader():
-#     # def __init__(self, database=''):
-#     #     self.database = database if database else SqliteDatabase('database.db')
-#
-#     def query_page(self, page_id):
-#         """ executes sql query, fetches all data for page_id.
-#         Different blocks have different number of computed key/val pairs
-#         can't assign column names from row values dynamically using SQL
-#         so can't pivot. Want to perform operations on data anyway, so
-#         might as well query everything and perform operations during db -> df
-#         """
-#
-#         q = """
-#         SELECT site.netloc, page.url, page.defaults,
-#         page.window_innerHeight, page.window_innerWidth,
-#         block.id, block.text, block.top, block.left,
-#         block.width, block.height, block.label,
-#         csskey.key, computed.val
-#         FROM site
-#         JOIN page ON page.site_id == site.id
-#         JOIN block ON block.page_id == page.id
-#         JOIN computed ON computed.block_id == block.id
-#         JOIN csskey ON csskey.id == computed.key_id
-#         WHERE page.id == {id}
-#         """.format(id=page_id)
-#
-#         cursor = self.database.execute_sql(q)
-#         return cursor.fetchall()
-#
-#     def data_to_dict(self, data):
-#         pass
-#
-#     def fetch_page_data(self, page_id):
-#
-#         data = query_page(page_id)
-#         # todo
+
+class DBReader():
+    # def __init__(self, database=''):
+    #     self.database = database if database else SqliteDatabase('database.db')
+
+    def query_page(self, page_id):
+        """ executes sql query, fetches all data for page_id.
+        Different blocks have different number of computed key/val pairs
+        can't assign column names from row values dynamically using SQL
+        so can't pivot. Want to perform operations on data anyway, so
+        might as well query everything and perform operations during db -> df
+        """
+
+        q = """
+        SELECT site.netloc, page.url, page.defaults,
+        page.window_innerHeight, page.window_innerWidth,
+        block.id, block.text, block.top, block.left,
+        block.width, block.height, block.label,
+        csskey.key, computed.val
+        FROM site
+        JOIN page ON page.site_id == site.id
+        JOIN block ON block.page_id == page.id
+        JOIN computed ON computed.block_id == block.id
+        JOIN csskey ON csskey.id == computed.key_id
+        WHERE page.id == {id}
+        """.format(id=page_id)
+
+        cursor = self.database.execute_sql(q)
+        return cursor.fetchall()
+
+    def data_to_dict(self, data):
+        pass
+
+    def fetch_page_data(self, page_id):
+
+        data = query_page(page_id)
+        # todo

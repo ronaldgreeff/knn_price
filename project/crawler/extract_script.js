@@ -108,12 +108,12 @@ function extractor__extract_links() {
 };
 
 function extract() {
+
   var data = {};
-
+  data['url'] = document.URL;
   var texts = extractor__extract_texts();
-  var links = extractor__extract_links();
-
   data['texts'] = texts;
+  var links = extractor__extract_links();
   data['links'] = links;
 
   data['env'] = {

@@ -60,7 +60,10 @@ class Driver(Driver_Config):
         return self.get_page(local_file)
 
 
-# firefox not loading beautybay.
+
+# Details of Firefox error:
+# "firefox not loading beautybay."
+# todo: look into it
 # todo: Store both FF and Chrome driver configs in /configs
 
 # class Driver_Config():
