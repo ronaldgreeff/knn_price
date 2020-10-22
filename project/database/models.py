@@ -1,10 +1,9 @@
 from datetime import datetime
 from peewee import *
 
-database = SqliteDatabase(None)
+database = SqliteDatabase(None) # defer initialisation
 
 class BaseModel(Model):
-
     class Meta:
         database = database
 

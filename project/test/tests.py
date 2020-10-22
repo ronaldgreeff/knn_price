@@ -5,25 +5,29 @@ from database.db_managers import DBWriter as dbw
 # from data import clusterer, dataframe
 # from utils import local_files, urls, features
 
+from os import getcwd
+from os.path import abspath, join
 import unittest
 import numpy as np
 from peewee import *
 import json
 
+test_root = abspath(join(getcwd(), 'test'))
+
 class TestDBWriter(unittest.TestCase):
 
-    database = 'test.db'
-    dbw = dbw(database)
+    test_db_path = join(test_root, 'test.db')
+    dbw = dbw(test_db_path)
 
-    # extract = 'test_extract.json'
-    # with open(extract, 'r') as f:
-    #     extract = json.loads(f.read())
+    extract = join(test_root, 'test_extract.json')
+    with open(extract, 'r') as f:
+        extract = json.loads(f.read())
 
-    # dbw.store_page_extract(
-    #     extract = extract,
-    #     url = 'https://www.boots.com/loreal-paris-revitalift-filler-serum-30ml-10274580',
-    #     purge_record = False,
-    # )
+    dbw.store_page_extract(
+        extract = extract,
+        url = 'https://www.boots.com/loreal-paris-revitalift-filler-serum-30ml-10274580',
+        purge_record = False,
+    )
 
 
 # class TestDataObj(unittest.TestCase):
